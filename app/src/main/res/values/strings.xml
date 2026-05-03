@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">NutriBot</string>
+    <string name="calories">Calories</string>
+    <string name="protein">Protein</string>
+    <string name="fat">Fat</string>
+    <string name="welcome_title">Start Your Health\nJourney Today</string>
+    <string name="welcome_desp">Track your dialy calories tracking with a\nhealthier lifestyle.</string>
+    <string name="get_started">Get Started</string>
+    <string name="what_your_name">What\'s your name?</string>
+    <string name="what_your_gender">What\'s your gender?</string>
+    <string name="what_your_age">What\'s your age?</string>
+    <string name="how_tall_are_you">How tall are you?</string>
+    <string name="what_is_your_weight">What\'s your current weight?</string>
+    <string name="what_is_your_goal">What\'s is your goal?</string>
+    <string name="what_is_your_activity">What\'s your activity level?</string>
+    <string name="continue_to">Continue</string>
+</resources>
