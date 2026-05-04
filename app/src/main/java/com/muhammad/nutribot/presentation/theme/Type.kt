@@ -7,8 +7,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.sp
 import com.muhammad.nutribot.R
 
@@ -49,7 +47,7 @@ val Typography = Typography(
     ),
     titleLarge = TextStyle(
         fontSize = 24.sp,
-        lineHeight = TextUnit(0.9f, type = TextUnitType.Em),
+        lineHeight = 32.sp,
         fontFamily = lato,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,

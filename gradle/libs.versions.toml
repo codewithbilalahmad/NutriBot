@@ -9,8 +9,10 @@ koin = "4.2.1"
 navigationCompose = "2.9.7"
 kotlinx-serialization = "1.11.0"
 material3 = "1.5.0-alpha17"
+splashscreen = "1.2.0"
 
 [libraries]
+splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
@@ -24,7 +26,6 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graph
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

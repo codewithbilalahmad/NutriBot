@@ -47,6 +47,7 @@ android {
 
 dependencies {
     implementation(libs.navigation)
+    implementation(libs.splashscreen)
     implementation(libs.koin.compose)
     implementation(libs.kotlinx.serialization)
     implementation(libs.androidx.core.ktx)

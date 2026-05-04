@@ -1,4 +1,4 @@
-package com.muhammad.nutribot.presentation.components
+package com.muhammad.nutribot.presentation.components.button
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.PaddingValues

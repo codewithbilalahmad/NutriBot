@@ -25,7 +25,7 @@ private val darkColorScheme = darkColorScheme(
     onSecondary = Secondary95,
 
     background = NeutralVariant10,
-    surface = NeutralVariant80,
+    surface = Color.Gray,
     surfaceVariant = Color(0xFF2C2C2E),
     onSurface = NeutralVariant99,
     onSurfaceVariant = NeutralVariant80,

@@ -1,6 +1,10 @@
 package com.muhammad.nutribot.presentation.screens.nurition_setup.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,7 +63,7 @@ fun NuritionSetupTopbar(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                val progress = (currentStepIndex / totalSteps).toFloat()
+                val progress = (currentStepIndex + 1).toFloat() / totalSteps.toFloat()
                 val animatedProgress by animateFloatAsState(
                     targetValue = progress,
                     animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
@@ -76,14 +80,19 @@ fun NuritionSetupTopbar(
                 )
             }
             Spacer(Modifier.width(16.dp))
-            Text(text = "$currentStepIndex/$totalSteps", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "${currentStepIndex + 1}/$totalSteps", style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(Modifier.height(12.dp))
-        Text(
-            text = stringResource(currentStep.label),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center)
-        )
+        AnimatedContent(targetState = currentStep, transitionSpec = {
+            fadeIn() togetherWith fadeOut()
+        }) {step ->
+            Text(
+                text = stringResource(step.label),
+                maxLines = 2,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center)
+            )
+        }
     }
 }

@@ -11,7 +11,23 @@
     <string name="what_your_age">What\'s your age?</string>
     <string name="how_tall_are_you">How tall are you?</string>
     <string name="what_is_your_weight">What\'s your current weight?</string>
-    <string name="what_is_your_goal">What\'s is your goal?</string>
+    <string name="what_is_your_goal">What\'s your main goal\nwith NutriBot?</string>
     <string name="what_is_your_activity">What\'s your activity level?</string>
     <string name="continue_to">Continue</string>
+    <string name="username">Username</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="cm">cm</string>
+    <string name="kg">kg</string>
+    <string name="sedentary">Sedentary</string>
+    <string name="moderately_active">Moderately Active</string>
+    <string name="lightly_active">Lightly Active</string>
+    <string name="very_active">Very Active</string>
+    <string name="super_active">Super Active</string>
+    <string name="lose_weight">Lose Weight</string>
+    <string name="gain_muscle">Gain Muscle</string>
+    <string name="maintain_weight">Maintain Weight</string>
+    <string name="boost_energy">Boost Energy</string>
+    <string name="improve_nutrition">Improve Nutrition</string>
+    <string name="gain_weight">Gain Weight</string>
 </resources>

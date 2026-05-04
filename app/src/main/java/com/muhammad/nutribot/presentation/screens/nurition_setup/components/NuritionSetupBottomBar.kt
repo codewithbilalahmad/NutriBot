@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.muhammad.nutribot.presentation.components.PrimaryButton
+import com.muhammad.nutribot.presentation.components.button.PrimaryButton
 
 @Composable
 fun NuritionSetupBottomBar(modifier: Modifier = Modifier,onNextStepClick : () -> Unit) {
