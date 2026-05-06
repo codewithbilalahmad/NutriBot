@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.screens.nurition_setup
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,8 +58,18 @@ fun NutritionSetupScreen(
     viewModel: NutritionSetupViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(state.nutritionCalculation) {
-        println("nutritionCalculation : ${state.nutritionCalculation}")
+    BackHandler {
+        when{
+            state.nutritionCalculation != null ->{
+                viewModel.onAction(NutritionSetupAction.OnResetNutritionData)
+            }
+            state.currentStepIndex > 0 ->{
+                viewModel.onAction(NutritionSetupAction.OnChangeCurrentStep(isIncrement = false))
+            }
+            else ->{
+                navHostController.navigateUp()
+            }
+        }
     }
     AnimatedContent(targetState = state.nutritionCalculation != null, transitionSpec = {
         fadeIn() togetherWith fadeOut()
@@ -73,7 +83,9 @@ fun NutritionSetupScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     IconButton(
-                        onClick = {},
+                        onClick = {
+                            viewModel.onAction(NutritionSetupAction.OnResetNutritionData)
+                        },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         shapes = IconButtonDefaults.shapes()
                     ) {
@@ -96,7 +108,8 @@ fun NutritionSetupScreen(
             }, bottomBar = {
                 NuritionSetupBottomBar(
                     modifier = Modifier.fillMaxWidth(),
-                    onNextStepClick = {},
+                    onNextStepClick = {
+                    },
                     isContinueEnable = true, label = R.string.start_your_plan_now
                 )
             }) { paddingValues ->
@@ -107,28 +120,30 @@ fun NutritionSetupScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    NutritionDonutChart(
-                        calories = state.nutritionCalculation!!.calories,
-                        modifier = Modifier.size(250.dp),
-                        nutrition = listOf(
-                            Nutrition(
-                                label = R.string.carbs,
-                                percentage = state.nutritionCalculation!!.carbsPercent,
-                                color = CarbsColor
-                            ),
-                            Nutrition(
-                                label = R.string.protein,
-                                percentage = state.nutritionCalculation!!.proteinPercent,
-                                color = ProteinColor
-                            ),
-                            Nutrition(
-                                label = R.string.fat,
-                                percentage = state.nutritionCalculation!!.fatPercent,
-                                color = FatColor
-                            )
+                    state.nutritionCalculation?.let { nutritionCalculation ->
+                        NutritionDonutChart(
+                            calories = nutritionCalculation.calories,
+                            modifier = Modifier.size(250.dp),
+                            nutrition = listOf(
+                                Nutrition(
+                                    label = R.string.carbs,
+                                    percentage = state.nutritionCalculation!!.carbsPercent,
+                                    color = CarbsColor
+                                ),
+                                Nutrition(
+                                    label = R.string.protein,
+                                    percentage = state.nutritionCalculation!!.proteinPercent,
+                                    color = ProteinColor
+                                ),
+                                Nutrition(
+                                    label = R.string.fat,
+                                    percentage = state.nutritionCalculation!!.fatPercent,
+                                    color = FatColor
+                                )
 
+                            )
                         )
-                    )
+                    }
                     Spacer(Modifier.height(50.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(0.7f),

@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.screens.nurition_setup
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender
@@ -10,12 +11,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class NutritionSetupViewModel(
-    private val nutritionCalculationRepository: NutritionCalculationRepository
-) : ViewModel(){
+    private val nutritionCalculationRepository: NutritionCalculationRepository,
+) : ViewModel() {
     private val _state = MutableStateFlow(NutritionSetupState())
     val state = _state.asStateFlow()
-    fun onAction(action : NutritionSetupAction){
-        when(action){
+    fun onAction(action: NutritionSetupAction) {
+        when (action) {
             is NutritionSetupAction.OnChangeCurrentStep -> onChangeCurrentStep(action.isIncrement)
             is NutritionSetupAction.OnGenderSelected -> onGenderSelected(action.gender)
             is NutritionSetupAction.OnAgeSelected -> onAgeSelected(action.age)
@@ -24,6 +25,23 @@ class NutritionSetupViewModel(
             is NutritionSetupAction.OnActivityLevelSelected -> onActivityLevelSelected(action.activityLevel)
             is NutritionSetupAction.OnToggleMainGoalSelection -> onToggleMainGoalSelection(action.mainGoal)
             NutritionSetupAction.OnCalculateNutrition -> onCalculateNutrition()
+            NutritionSetupAction.OnResetNutritionData -> onResetNutritionData()
+        }
+    }
+
+    private fun onResetNutritionData() {
+        _state.update {
+            it.copy(
+                username = TextFieldState(),
+                selectedGender = Gender.MALE,
+                selectedAge =50,
+                selectedMainGoals = emptyList(),
+                selectedActivityLevel = ActivityLevel.SEDENTARY,
+                selectedHeightCm = 180,
+                selectedWeightKg = 60,
+                nutritionCalculation = null,
+                currentStepIndex = 0
+            )
         }
     }
 
@@ -42,10 +60,10 @@ class NutritionSetupViewModel(
     }
 
     private fun onToggleMainGoalSelection(mainGoal: MainGoal) {
-        _state.update {currentState ->
-            val updatedMainGoals = if(currentState.selectedMainGoals.contains(mainGoal)){
+        _state.update { currentState ->
+            val updatedMainGoals = if (currentState.selectedMainGoals.contains(mainGoal)) {
                 currentState.selectedMainGoals - mainGoal
-            } else{
+            } else {
                 currentState.selectedMainGoals + mainGoal
             }
             currentState.copy(selectedMainGoals = updatedMainGoals)
@@ -74,7 +92,7 @@ class NutritionSetupViewModel(
 
     private fun onChangeCurrentStep(increment: Boolean) {
         _state.update {
-            it.copy(currentStepIndex = if(increment) it.currentStepIndex + 1 else it.currentStepIndex - 1)
+            it.copy(currentStepIndex = if (increment) it.currentStepIndex + 1 else it.currentStepIndex - 1)
         }
     }
 }
