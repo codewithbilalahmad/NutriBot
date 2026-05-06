@@ -4,22 +4,40 @@ import androidx.lifecycle.ViewModel
 import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender
 import com.muhammad.nutribot.domain.model.MainGoal
+import com.muhammad.nutribot.domain.repository.NutritionCalculationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class NuritionSetupViewModel : ViewModel(){
-    private val _state = MutableStateFlow(NuritionSetupState())
+class NutritionSetupViewModel(
+    private val nutritionCalculationRepository: NutritionCalculationRepository
+) : ViewModel(){
+    private val _state = MutableStateFlow(NutritionSetupState())
     val state = _state.asStateFlow()
-    fun onAction(action : NuritionSetupAction){
+    fun onAction(action : NutritionSetupAction){
         when(action){
-            is NuritionSetupAction.OnChangeCurrentStep -> onChangeCurrentStep(action.isIncrement)
-            is NuritionSetupAction.OnGenderSelected -> onGenderSelected(action.gender)
-            is NuritionSetupAction.OnAgeSelected -> onAgeSelected(action.age)
-            is NuritionSetupAction.OnHeightCmSelected -> onHeightCmSelected(action.heightCm)
-            is NuritionSetupAction.OnWeightKgSelected -> onWeightKgSelected(action.weightKg)
-            is NuritionSetupAction.OnActivityLevelSelected -> onActivityLevelSelected(action.activityLevel)
-            is NuritionSetupAction.OnToggleMainGoalSelection -> onToggleMainGoalSelection(action.mainGoal)
+            is NutritionSetupAction.OnChangeCurrentStep -> onChangeCurrentStep(action.isIncrement)
+            is NutritionSetupAction.OnGenderSelected -> onGenderSelected(action.gender)
+            is NutritionSetupAction.OnAgeSelected -> onAgeSelected(action.age)
+            is NutritionSetupAction.OnHeightCmSelected -> onHeightCmSelected(action.heightCm)
+            is NutritionSetupAction.OnWeightKgSelected -> onWeightKgSelected(action.weightKg)
+            is NutritionSetupAction.OnActivityLevelSelected -> onActivityLevelSelected(action.activityLevel)
+            is NutritionSetupAction.OnToggleMainGoalSelection -> onToggleMainGoalSelection(action.mainGoal)
+            NutritionSetupAction.OnCalculateNutrition -> onCalculateNutrition()
+        }
+    }
+
+    private fun onCalculateNutrition() {
+        _state.update { currentState ->
+            val nutritionCalculation = nutritionCalculationRepository.calculateNutrition(
+                age = currentState.selectedAge,
+                mainGoals = currentState.selectedMainGoals,
+                activityLevel = currentState.selectedActivityLevel,
+                gender = currentState.selectedGender,
+                weightKg = currentState.selectedWeightKg,
+                heightCm = currentState.selectedHeightCm
+            )
+            currentState.copy(nutritionCalculation = nutritionCalculation)
         }
     }
 

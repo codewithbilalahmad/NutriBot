@@ -50,7 +50,7 @@ import kotlin.math.roundToInt
 @Composable
 fun MeasurementPicker(
     modifier: Modifier = Modifier,
-    showOverlay: Boolean = true,
+    showOverlay: Boolean = false,
     overlayColor: Color = MaterialTheme.colorScheme.background,
     tickColor: Color = MaterialTheme.colorScheme.surface,
     majorTickColor: Color = MaterialTheme.colorScheme.onBackground,
@@ -214,8 +214,8 @@ fun MeasurementPicker(
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = (-12).dp)
-                .size(30.dp)
+                .offset(y = (-17).dp)
+                .size(35.dp)
         )
     }
 }

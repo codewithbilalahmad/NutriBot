@@ -16,3 +16,7 @@ val NeutralVariant99 = Color(0xFFFFFFFF)
 
 val DarkError = Color(0xFFFFB4AB)
 val DarkErrorContainer = Color(0xFF93000A)
+
+val CarbsColor = Color(0xFFF31205)    // Red
+val ProteinColor = Color(0xFFFF9500)  // Orange
+val FatColor = Color(0xFF007AFF)      // Blue

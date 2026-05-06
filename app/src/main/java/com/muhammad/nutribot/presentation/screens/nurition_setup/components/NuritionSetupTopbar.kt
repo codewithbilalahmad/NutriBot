@@ -80,7 +80,7 @@ fun NuritionSetupTopbar(
                 )
             }
             Spacer(Modifier.width(16.dp))
-            Text(text = "${currentStepIndex + 1}/$totalSteps", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "${currentStepIndex + 1} / $totalSteps", style = MaterialTheme.typography.bodyLarge)
         }
         Spacer(Modifier.height(12.dp))
         AnimatedContent(targetState = currentStep, transitionSpec = {

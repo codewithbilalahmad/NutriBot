@@ -6,12 +6,14 @@ import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender
 import com.muhammad.nutribot.domain.model.MainGoal
 import com.muhammad.nutribot.domain.model.NuritionSetupStep
+import com.muhammad.nutribot.domain.model.NutritionCalculation
 
-data class NuritionSetupState(
+data class NutritionSetupState(
     val selectedGender : Gender = Gender.MALE,
     val username : TextFieldState = TextFieldState(),
     val selectedAge : Int = 50,
     val selectedHeightCm : Int = 180,
+    val nutritionCalculation : NutritionCalculation? = null,
     val selectedWeightKg : Int = 60,
     val selectedMainGoals : List<MainGoal> = emptyList(),
     val selectedActivityLevel : ActivityLevel = ActivityLevel.SEDENTARY,
@@ -24,7 +26,7 @@ data class NuritionSetupState(
         NuritionSetupStep(label = R.string.what_is_your_activity),
         NuritionSetupStep(label = R.string.what_is_your_goal),
     ),
-    val currentStepIndex : Int = 0,
+    val currentStepIndex : Int = 0
 ){
     val currentStep = steps[currentStepIndex]
 }

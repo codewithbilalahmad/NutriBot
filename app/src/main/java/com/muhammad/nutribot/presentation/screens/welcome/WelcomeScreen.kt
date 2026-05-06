@@ -51,7 +51,7 @@ fun WelcomeScreen(navController: NavHostController) {
             WelcomeNutritionSection()
         }, bottomBar = {
             GetStartedButton(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp), onClick = {
-                navController.navigate(Destination.NuritionSetupScreen)
+                navController.navigate(Destination.NutritionSetupScreen)
             })
         },
         containerColor = MaterialTheme.colorScheme.primary

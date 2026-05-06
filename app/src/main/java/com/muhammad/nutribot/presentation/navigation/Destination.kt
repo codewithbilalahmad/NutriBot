@@ -8,5 +8,5 @@ sealed interface Destination {
     @Serializable
     data object BoardingScreen : Destination
     @Serializable
-    data object NuritionSetupScreen : Destination
+    data object NutritionSetupScreen : Destination
 }

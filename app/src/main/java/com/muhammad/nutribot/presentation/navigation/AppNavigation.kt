@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.muhammad.nutribot.presentation.screens.nurition_setup.NuritionSetupScreen
+import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
 import com.muhammad.nutribot.presentation.screens.welcome.WelcomeScreen
 
 @Composable
@@ -15,8 +15,8 @@ fun AppNavigation(
         composable<Destination.WelcomeScreen>{
             WelcomeScreen(navController = navController)
         }
-        composable<Destination.NuritionSetupScreen>{
-            NuritionSetupScreen(navHostController = navController)
+        composable<Destination.NutritionSetupScreen>{
+            NutritionSetupScreen(navHostController = navController)
         }
         composable<Destination.BoardingScreen>{
 

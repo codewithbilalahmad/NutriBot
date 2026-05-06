@@ -53,7 +53,7 @@ fun MainGoalCard(
                 .fillMaxWidth()
                 .then(
                     if (isSelected) Modifier.border(
-                        width = 1.dp,
+                        width = 1.5.dp,
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(8.dp)
                     ) else Modifier
