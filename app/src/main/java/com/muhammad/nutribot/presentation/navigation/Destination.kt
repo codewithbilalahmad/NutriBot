@@ -9,4 +9,10 @@ sealed interface Destination {
     data object BoardingScreen : Destination
     @Serializable
     data object NutritionSetupScreen : Destination
+    @Serializable
+    data object DiaryScreen : Destination
+    @Serializable
+    data object ProgressScreen : Destination
+    @Serializable
+    data object SettingScreen : Destination
 }

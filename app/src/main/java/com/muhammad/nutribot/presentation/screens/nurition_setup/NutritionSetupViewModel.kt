@@ -2,16 +2,22 @@ package com.muhammad.nutribot.presentation.screens.nurition_setup
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender
 import com.muhammad.nutribot.domain.model.MainGoal
-import com.muhammad.nutribot.domain.repository.NutritionCalculationRepository
+import com.muhammad.nutribot.domain.model.UserProfile
+import com.muhammad.nutribot.domain.repository.nutrition_calculation.NutritionCalculationRepository
+import com.muhammad.nutribot.domain.repository.settings.SettingRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class NutritionSetupViewModel(
     private val nutritionCalculationRepository: NutritionCalculationRepository,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(NutritionSetupState())
     val state = _state.asStateFlow()
@@ -26,6 +32,26 @@ class NutritionSetupViewModel(
             is NutritionSetupAction.OnToggleMainGoalSelection -> onToggleMainGoalSelection(action.mainGoal)
             NutritionSetupAction.OnCalculateNutrition -> onCalculateNutrition()
             NutritionSetupAction.OnResetNutritionData -> onResetNutritionData()
+            NutritionSetupAction.OnStartNutritionPlan -> onStartNutritionPlan()
+        }
+    }
+
+    private fun onStartNutritionPlan() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentState = _state.value
+            val nutritionCalculation = currentState.nutritionCalculation ?: return@launch
+            val userProfile = UserProfile(
+                username = currentState.username.text.toString().trim(),
+                gender = currentState.selectedGender,
+                age = currentState.selectedAge,
+                mainGoal = currentState.selectedMainGoals,
+                activityLevel = currentState.selectedActivityLevel,
+                weightKg = currentState.selectedWeightKg,
+                heightCm = currentState.selectedHeightCm
+            )
+            settingRepository.saveUserProfile(userProfile)
+            settingRepository.saveNutritionCalculation(nutritionCalculation)
+            settingRepository.saveIsUserLoggedIn(true)
         }
     }
 
@@ -34,7 +60,7 @@ class NutritionSetupViewModel(
             it.copy(
                 username = TextFieldState(),
                 selectedGender = Gender.MALE,
-                selectedAge =50,
+                selectedAge = 50,
                 selectedMainGoals = emptyList(),
                 selectedActivityLevel = ActivityLevel.SEDENTARY,
                 selectedHeightCm = 180,

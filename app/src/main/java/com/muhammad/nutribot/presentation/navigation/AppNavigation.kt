@@ -4,14 +4,16 @@ import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
 import com.muhammad.nutribot.presentation.screens.welcome.WelcomeScreen
 
 @Composable
 fun AppNavigation(
-    navController:  NavHostController
+    navController:  NavHostController,isUserLoggedIn : Boolean
 ) {
-    NavHost(navController = navController, startDestination = Destination.WelcomeScreen){
+    val startDestination = if(isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
+    NavHost(navController = navController, startDestination = startDestination){
         composable<Destination.WelcomeScreen>{
             WelcomeScreen(navController = navController)
         }
@@ -20,6 +22,9 @@ fun AppNavigation(
         }
         composable<Destination.BoardingScreen>{
 
+        }
+        composable<Destination.DiaryScreen>{
+            DiaryScreen(navHostController = navController)
         }
     }
 }

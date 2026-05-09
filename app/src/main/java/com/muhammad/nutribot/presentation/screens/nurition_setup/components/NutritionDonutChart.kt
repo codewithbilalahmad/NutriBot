@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.res.ResourcesCompat
 import com.muhammad.nutribot.R
@@ -34,8 +33,8 @@ fun NutritionDonutChart(
     nutrition: List<Nutrition>
 ) {
     val context = LocalContext.current
-    val containerColor = MaterialTheme.colorScheme.background
-    val contentColor = MaterialTheme.colorScheme.onBackground
+    val containerColor = MaterialTheme.colorScheme.surfaceContainer
+    val contentColor = MaterialTheme.colorScheme.onSurface
     val latoTypeface = ResourcesCompat.getFont(context, R.font.lato)
     val total = nutrition.sumOf { it.percentage.toDouble()}.toFloat()
     Box(modifier = modifier, contentAlignment = Alignment.Center){
@@ -70,7 +69,7 @@ fun NutritionDonutChart(
                     typeface = latoTypeface
                     textAlign = Paint.Align.CENTER
                     isFakeBoldText = true
-                    color = containerColor.toArgb()
+                    color = contentColor.toArgb()
                     isAntiAlias = true
                 }
                 val textWidth = textPaint.measureText(text)
@@ -82,7 +81,7 @@ fun NutritionDonutChart(
                 val rectRight = x + textWidth / 2 + paddingX
                 val rectBottom = y + textHeight / 2 + paddingY
                 drawRoundRect(
-                    color = contentColor,
+                    color = containerColor,
                     topLeft = Offset(x = rectLeft, y = rectTop),
                     size = Size(width = rectRight - rectLeft, height = rectBottom - rectTop),
                     cornerRadius = CornerRadius(60f, 60f)

@@ -1,4 +1,4 @@
-package com.muhammad.nutribot.domain.repository
+package com.muhammad.nutribot.domain.repository.nutrition_calculation
 
 import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender

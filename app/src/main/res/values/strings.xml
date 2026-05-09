@@ -34,4 +34,16 @@
     <string name="start_your_plan_now">Start Your Plan Now</string>
     <string name="carbs">Carbs</string>
     <string name="kcal">kcal</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="diary">Diary</string>
+    <string name="progress">Progress</string>
+    <string name="calories_intake">Calories Intake</string>
+    <string name="eaten">Eaten</string>
+    <string name="goal">Goal</string>
+    <string name="left">Left</string>
+    <string name="no_food_added">You haven\'t uploaded any food</string>
+    <string name="add_today_meals">Click to add Today\'s meals</string>
+    <string name="settings">Settings</string>
+    <string name="profile">Profile</string>
 </resources>

@@ -39,7 +39,7 @@ fun HeightStepSection(
             )
             Text(
                 text = stringResource(R.string.cm),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.surface)
             )
         }
         MeasurementPicker(

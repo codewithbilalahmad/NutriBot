@@ -39,7 +39,7 @@ fun WeightStepSection(
             )
             Text(
                 text = stringResource(R.string.kg),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.surface)
             )
         }
         MeasurementPicker(

@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.components.wheel_picker
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -36,7 +36,7 @@ import kotlin.math.max
 fun WheelPicker(
     modifier: Modifier = Modifier,
     range: IntRange,
-    initialValue : Int,
+    initialValue: Int,
     visibleItemsCount: Int = 7,
     itemHeight: Dp = 50.dp,
     onItemSelected: (Int) -> Unit,
@@ -67,17 +67,6 @@ fun WheelPicker(
         }
     }
     Box(modifier = modifier.height(pickerHeight), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(itemHeight)
-                .clip(CircleShape)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                )
-        )
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
@@ -108,7 +97,7 @@ fun WheelPicker(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                        val textStyle = if(isSelected) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleMedium
+                        val textStyle = if (isSelected) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleMedium
                         Text(
                             text = item.toString(),
                             style = textStyle.copy(
@@ -119,6 +108,27 @@ fun WheelPicker(
                     }
                 }
             }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(itemHeight)
+                .border(
+                    width = 1.5.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .background(MaterialTheme.colorScheme.surfaceContainer,RoundedCornerShape(16.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            val item = items[centerIndex]
+            Text(
+                text = item.toString(),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
         }
     }
 }

@@ -14,4 +14,5 @@ sealed interface NutritionSetupAction{
     data class OnActivityLevelSelected(val activityLevel: ActivityLevel) : NutritionSetupAction
     data class OnToggleMainGoalSelection(val mainGoal: MainGoal) : NutritionSetupAction
     data object OnCalculateNutrition : NutritionSetupAction
+    data object OnStartNutritionPlan : NutritionSetupAction
 }

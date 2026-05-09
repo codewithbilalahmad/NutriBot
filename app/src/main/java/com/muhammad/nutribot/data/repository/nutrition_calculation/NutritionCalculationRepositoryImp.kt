@@ -1,10 +1,10 @@
-package com.muhammad.nutribot.data.nutrition
+package com.muhammad.nutribot.data.repository.nutrition_calculation
 
 import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender
 import com.muhammad.nutribot.domain.model.MainGoal
 import com.muhammad.nutribot.domain.model.NutritionCalculation
-import com.muhammad.nutribot.domain.repository.NutritionCalculationRepository
+import com.muhammad.nutribot.domain.repository.nutrition_calculation.NutritionCalculationRepository
 
 class NutritionCalculationRepositoryImp : NutritionCalculationRepository {
     override fun calculateNutrition(

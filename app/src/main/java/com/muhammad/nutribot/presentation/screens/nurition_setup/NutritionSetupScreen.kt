@@ -109,6 +109,7 @@ fun NutritionSetupScreen(
                 NuritionSetupBottomBar(
                     modifier = Modifier.fillMaxWidth(),
                     onNextStepClick = {
+                        viewModel.onAction(NutritionSetupAction.OnStartNutritionPlan)
                     },
                     isContinueEnable = true, label = R.string.start_your_plan_now
                 )
