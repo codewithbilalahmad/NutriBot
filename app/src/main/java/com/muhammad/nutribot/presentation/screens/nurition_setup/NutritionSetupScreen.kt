@@ -37,7 +37,7 @@ import androidx.navigation.NavHostController
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Nutrition
 import com.muhammad.nutribot.presentation.components.textfield.AppTextField
-import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPicker
+import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPickerHorizontal
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.ActivityLevelStepSection
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.GenderStepSection
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.HeightStepSection
@@ -59,14 +59,16 @@ fun NutritionSetupScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     BackHandler {
-        when{
-            state.nutritionCalculation != null ->{
+        when {
+            state.nutritionCalculation != null -> {
                 viewModel.onAction(NutritionSetupAction.OnResetNutritionData)
             }
-            state.currentStepIndex > 0 ->{
+
+            state.currentStepIndex > 0 -> {
                 viewModel.onAction(NutritionSetupAction.OnChangeCurrentStep(isIncrement = false))
             }
-            else ->{
+
+            else -> {
                 navHostController.navigateUp()
             }
         }
@@ -227,16 +229,24 @@ fun NutritionSetupScreen(
                             }
 
                             2 -> {
-                                WheelPicker(
-                                    range = 1..100,
-                                    onItemSelected = { age ->
-                                        viewModel.onAction(NutritionSetupAction.OnAgeSelected(age))
-                                    },
-                                    initialValue = 50,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 24.dp)
-                                )
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    WheelPickerHorizontal(
+                                        range = 4..100,
+                                        onItemSelected = { age ->
+                                            viewModel.onAction(NutritionSetupAction.OnAgeSelected(age))
+                                        },
+                                        initialValue = 50,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.years),
+                                        style = MaterialTheme.typography.titleSmall.copy(textAlign = TextAlign.Center)
+                                    )
+                                }
                             }
 
                             3 -> {

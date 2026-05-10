@@ -2,10 +2,12 @@ package com.muhammad.nutribot.presentation.screens.nurition_setup.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.muhammad.nutribot.R
@@ -36,6 +39,16 @@ fun MainGoalCard(
     isSelected: Boolean,
     onSelectMainGoal: (MainGoal) -> Unit,
 ) {
+    val borderColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+        animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+        label = "borderColor"
+    )
+    val borderWidth by animateDpAsState(
+        targetValue = if (isSelected) 2.dp else 1.dp,
+        animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+        label = "borderColor"
+    )
     val containerColor by animateColorAsState(
         targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surfaceContainer,
         animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
@@ -45,20 +58,14 @@ fun MainGoalCard(
         modifier = modifier.rippleClickable {
             onSelectMainGoal(mainGoal)
         },
-        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(width = borderWidth, color = borderColor),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .then(
-                    if (isSelected) Modifier.border(
-                        width = 1.5.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(8.dp)
-                    ) else Modifier
-                )
-                .padding(horizontal = 12.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -67,22 +74,16 @@ fun MainGoalCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(text = mainGoal.icon, fontSize = 25.sp)
-                Text(
-                    text = stringResource(mainGoal.label),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            AnimatedVisibility(
-                visible = isSelected,
-                enter = fadeIn(MaterialTheme.motionScheme.slowEffectsSpec()),
-                exit = fadeOut(MaterialTheme.motionScheme.slowEffectsSpec()),
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_check),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)){
+                    Text(
+                        text = stringResource(mainGoal.label),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = stringResource(mainGoal.desp),
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.surface)
+                    )
+                }
             }
         }
     }

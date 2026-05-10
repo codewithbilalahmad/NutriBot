@@ -15,6 +15,7 @@ import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import com.muhammad.nutribot.main.MainViewModel
 import com.muhammad.nutribot.presentation.screens.diary.DiaryViewModel
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupViewModel
+import com.muhammad.nutribot.presentation.screens.setting.SettingViewModel
 import com.muhammad.nutribot.utils.Constants.DATABASE_NAME
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
@@ -41,4 +42,5 @@ val appModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::NutritionSetupViewModel)
     viewModelOf(::DiaryViewModel)
+    viewModelOf(::SettingViewModel)
 }

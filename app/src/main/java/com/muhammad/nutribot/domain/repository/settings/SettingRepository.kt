@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface SettingRepository {
     suspend fun saveUserProfile(userProfile: UserProfile)
+    suspend fun saveEnableReminder(enable : Boolean)
     suspend fun saveNutritionCalculation(nutritionCalculation: NutritionCalculation)
     suspend fun saveIsUserLoggedIn(loggedIn : Boolean)
     fun observeUserProfile() : Flow<UserProfile?>
     fun observeNutritionCalculation() : Flow<NutritionCalculation?>
     fun observeIsUserLoggedIn() : Flow<Boolean>
+    fun observeEnableReminder() : Flow<Boolean>
 }

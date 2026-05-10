@@ -9,6 +9,7 @@ import com.muhammad.nutribot.domain.model.NutritionCalculation
 import com.muhammad.nutribot.domain.model.UserProfile
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import com.muhammad.nutribot.utils.Constants.DATA_STORE_FILE_NAME
+import com.muhammad.nutribot.utils.Constants.IS_REMINDER_ENABLE_PREF_KEY
 import com.muhammad.nutribot.utils.Constants.IS_USER_LOGGED_IN_PREF_KEY
 import com.muhammad.nutribot.utils.Constants.NUTRITION_CALCULATION_PREF_KEY
 import com.muhammad.nutribot.utils.Constants.USER_PROFILE_PREF_KEY
@@ -26,11 +27,18 @@ class SettingRepositoryImp(
         private val USER_PROFILE_KEY = stringPreferencesKey(USER_PROFILE_PREF_KEY)
         private val NUTRITION_CALCULATION_KEY = stringPreferencesKey(NUTRITION_CALCULATION_PREF_KEY)
         private val IS_USER_LOGGED_IN_KEY = booleanPreferencesKey(IS_USER_LOGGED_IN_PREF_KEY)
+        private val IS_REMINDER_ENABLE_KEY = booleanPreferencesKey(IS_REMINDER_ENABLE_PREF_KEY)
     }
     override suspend fun saveUserProfile(userProfile: UserProfile) {
         context.prefs.edit {prefs ->
             val json = Json.encodeToString<UserProfile>(userProfile)
             prefs[USER_PROFILE_KEY] = json
+        }
+    }
+
+    override suspend fun saveEnableReminder(enable: Boolean) {
+        context.prefs.edit { prefs ->
+            prefs[IS_REMINDER_ENABLE_KEY] = enable
         }
     }
 
@@ -78,6 +86,12 @@ class SettingRepositoryImp(
     override fun observeIsUserLoggedIn(): Flow<Boolean> {
         return context.prefs.data.map { prefs ->
             prefs[IS_USER_LOGGED_IN_KEY] ?: false
+        }.distinctUntilChanged()
+    }
+
+    override fun observeEnableReminder(): Flow<Boolean> {
+        return context.prefs.data.map { prefs ->
+            prefs[IS_REMINDER_ENABLE_KEY] ?: false
         }.distinctUntilChanged()
     }
 }

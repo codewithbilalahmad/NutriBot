@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.components.wheel_picker
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,9 +25,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,8 +44,11 @@ fun WheelPicker(
     modifier: Modifier = Modifier,
     range: IntRange,
     initialValue: Int,
-    visibleItemsCount: Int = 7,
-    itemHeight: Dp = 50.dp,
+    selectedTextStyle : TextStyle = MaterialTheme.typography.titleMedium,
+    unSelectedTextStyle : TextStyle = MaterialTheme.typography.titleMedium,
+    @StringRes label : Int,
+    visibleItemsCount: Int = 5,
+    itemHeight: Dp = 40.dp,
     onItemSelected: (Int) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -96,13 +106,11 @@ fun WheelPicker(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                        val textStyle = if (isSelected) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleMedium
                         Text(
-                            text = item.toString(),
-                            style = textStyle.copy(
+                            text = "${item.toString()} ${stringResource(label)}",
+                            style = unSelectedTextStyle.copy(
                                 textAlign = TextAlign.Center,
-                                color = color
+                                color = MaterialTheme.colorScheme.surface
                             )
                         )
                     }
@@ -111,24 +119,40 @@ fun WheelPicker(
         }
         Box(
             modifier = Modifier
-                .fillMaxWidth()
                 .height(itemHeight)
                 .border(
                     width = 1.5.dp,
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 )
-                .background(MaterialTheme.colorScheme.surfaceContainer,RoundedCornerShape(16.dp)),
+                .background(MaterialTheme.colorScheme.surfaceContainer,RoundedCornerShape(16.dp))
+                .padding(horizontal = 32.dp),
             contentAlignment = Alignment.Center
         ) {
+            Row(verticalAlignment = Alignment.CenterVertically){  }
             val item = items[centerIndex]
             Text(
-                text = item.toString(),
-                style = MaterialTheme.typography.headlineMedium.copy(
+                text = "${item.toString()} ${stringResource(label)}",
+                style = selectedTextStyle.copy(
                     textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             )
         }
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.2f to MaterialTheme.colorScheme.background.copy(0.6f),
+                            0.3f to Color.Transparent,
+                            0.7f to Color.Transparent,
+                            1f to MaterialTheme.colorScheme.background.copy(0.6f)
+                        )
+                    )
+                )
+        )
     }
 }

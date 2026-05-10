@@ -1,10 +1,9 @@
-package com.muhammad.nutribot.presentation.screens.nurition_setup.components
+package com.muhammad.nutribot.presentation.screens.setting.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,16 +20,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.muhammad.nutribot.domain.model.ActivityLevel
+import com.muhammad.nutribot.domain.model.Gender
 import com.muhammad.nutribot.utils.rippleClickable
 
 @Composable
-fun ActivityLevelCard(
+fun GenderCard(
     modifier: Modifier = Modifier,
-    activityLevel: ActivityLevel,
+    gender: Gender,
     isSelected: Boolean,
-    onSelectActivityLevel: (ActivityLevel) -> Unit,
+    onSelectGender: (Gender) -> Unit,
 ) {
+    val containerColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background,
+        animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+        label = "borderColor"
+    )
     val borderColor by animateColorAsState(
         targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
         animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
@@ -41,42 +45,27 @@ fun ActivityLevelCard(
         animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
         label = "borderColor"
     )
-    val containerColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background,
-        animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
-        label = "containerColor"
-    )
     Card(
         modifier = modifier.rippleClickable(onClick = {
-            onSelectActivityLevel(activityLevel)
+            onSelectGender(gender)
         }),
-        border = BorderStroke(width = borderWidth, color = borderColor),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        border = BorderStroke(width = borderWidth, color = borderColor)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(text = activityLevel.icon, fontSize = 25.sp)
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)){
-                    Text(
-                        text = stringResource(activityLevel.label),
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = stringResource(activityLevel.desp),
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.surface)
-                    )
-                }
-            }
+            val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.ExtraLight
+            Text(text = gender.emoji, fontSize = 26.sp)
+            Text(
+                text = stringResource(gender.value),
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = fontWeight)
+            )
         }
     }
 }

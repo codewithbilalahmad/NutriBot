@@ -27,8 +27,7 @@ import org.koin.androidx.compose.koinViewModel
 fun DiaryScreen(navHostController: NavHostController, viewModel: DiaryViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val weekRange = -100..0
-    val weekCalenderPagerState =
-        rememberPagerState(initialPage = weekRange.count() - 1) { weekRange.count() }
+    val weekCalenderPagerState = rememberPagerState(initialPage = weekRange.count() - 1) { weekRange.count() }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DiaryTopbar(
             modifier = Modifier.fillMaxWidth(),

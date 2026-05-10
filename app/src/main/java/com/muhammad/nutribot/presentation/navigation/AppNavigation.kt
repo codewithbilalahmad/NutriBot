@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
+import com.muhammad.nutribot.presentation.screens.setting.SettingScreen
 import com.muhammad.nutribot.presentation.screens.welcome.WelcomeScreen
 
 @Composable
@@ -25,6 +26,9 @@ fun AppNavigation(
         }
         composable<Destination.DiaryScreen>{
             DiaryScreen(navHostController = navController)
+        }
+        composable<Destination.SettingScreen>{
+            SettingScreen(navHostController = navController)
         }
     }
 }

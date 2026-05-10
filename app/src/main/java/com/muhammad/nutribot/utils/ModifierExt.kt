@@ -18,7 +18,7 @@ fun Modifier.rippleClickable(enabled: Boolean = true, onClick: () -> Unit): Modi
     val interactionSource = remember { MutableInteractionSource() }
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.9f else 1f,
+        targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
         label = "scale"
     )
