@@ -15,11 +15,12 @@ fun FoodWithWithIngredients.toFood(): Food {
         carbs = food.carbs,
         eatenAt = Instant.fromEpochMilliseconds(food.eatenAt),
         ingredients = ingredients.map { it.toIngredient() },
-        numberOfServings =  food.numberOfServings
+        numberOfServings = food.numberOfServings,
+        confidenceScore = food.confidenceScore,
     )
 }
 
-fun FoodEntity.toFood(): Food{
+fun FoodEntity.toFood(): Food {
     return Food(
         id = id,
         name = name,
@@ -29,11 +30,12 @@ fun FoodEntity.toFood(): Food{
         carbs = carbs,
         eatenAt = Instant.fromEpochMilliseconds(eatenAt),
         ingredients = emptyList(),
+        confidenceScore = confidenceScore,
         numberOfServings = numberOfServings
     )
 }
 
-fun Food.toFoodEntity() : FoodEntity{
+fun Food.toFoodEntity(): FoodEntity {
     return FoodEntity(
         id = id,
         name = name,
@@ -42,7 +44,8 @@ fun Food.toFoodEntity() : FoodEntity{
         protein = protein,
         carbs = carbs,
         eatenAt = eatenAt.toEpochMilliseconds(),
-        numberOfServings = numberOfServings
+        numberOfServings = numberOfServings,
+        confidenceScore = confidenceScore,
     )
 }
 

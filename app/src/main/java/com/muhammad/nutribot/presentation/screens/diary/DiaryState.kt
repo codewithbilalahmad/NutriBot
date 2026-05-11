@@ -11,8 +11,10 @@ data class DiaryState(
     val foods: List<Food> = emptyList(),
     val streak : Int= 0,
     val nutritionCalculation: NutritionCalculation?=null,
+    val showAddFoodBottomSheet : Boolean = false,
     val selectedDate : LocalDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 ){
+    val weekRange = -100..0
     val eatenCalories : Int = foods.sumOf { it.calories }
     val goalCalories = nutritionCalculation?.calories ?: 0
     val goalProteinGrams = nutritionCalculation?.proteinGrams ?: 0

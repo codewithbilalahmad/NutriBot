@@ -48,6 +48,11 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.image.labeling)
+    implementation(libs.generativeai)
     implementation(libs.navigation)
     implementation(libs.kotlinx.datetime)
     implementation(libs.datastore)

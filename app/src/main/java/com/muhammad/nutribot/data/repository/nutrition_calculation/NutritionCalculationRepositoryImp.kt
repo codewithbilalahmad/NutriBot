@@ -29,8 +29,7 @@ class NutritionCalculationRepositoryImp : NutritionCalculationRepository {
             MainGoal.GAIN_MUSCLE -> tdee + 300
             else -> tdee
         }.toInt()
-        val goal = mainGoals.firstOrNull() ?: MainGoal.MAINTAIN_WEIGHT
-        val (proteinPercent, carbsPercent, fatPercent) = getNuritionRatios(goal)
+        val (proteinPercent, carbsPercent, fatPercent) = getNuritionRatios(mainGoals)
         val proteinCalories = goalCalories * proteinPercent
         val carbsCalories = goalCalories * carbsPercent
         val fatCalories = goalCalories * fatPercent
@@ -58,18 +57,28 @@ class NutritionCalculationRepositoryImp : NutritionCalculationRepository {
         return when (gender) {
             Gender.MALE -> 10 * weightKg + 6.25 * heightCm - 5 * age + 5
             Gender.FEMALE -> 10 * weightKg + 6.25 * heightCm - 5 * age - 161
-            Gender.PREFER_NOT_TO_SAY -> 0.0
+            Gender.PREFER_NOT_TO_SAY ->{
+                val male = 10 * weightKg + 6.25 * heightCm - 5 * age + 5
+                val female = 10 * weightKg + 6.25 * heightCm - 5 * age - 161
+                (male + female) / 2
+            }
         }
     }
 
-    private fun getNuritionRatios(goal: MainGoal): Triple<Double, Double, Double> {
-        return when (goal) {
-            MainGoal.LOSE_WEIGHT -> Triple(0.30, 0.40, 0.30)
-            MainGoal.GAIN_MUSCLE -> Triple(0.30, 0.45, 0.25)
-            MainGoal.MAINTAIN_WEIGHT -> Triple(0.25, 0.50, 0.25)
-            MainGoal.BOOST_ENERGY -> Triple(0.20, 0.55, 0.25)
-            MainGoal.IMPROVE_NUTRITION -> Triple(0.25, 0.45, 0.30)
-            MainGoal.GAIN_WEIGHT -> Triple(0.25, 0.55, 0.20)
+    private fun getNuritionRatios(goals: List<MainGoal>): Triple<Double, Double, Double> {
+        val ratios = goals.map { goal ->
+            when (goal) {
+                MainGoal.LOSE_WEIGHT -> Triple(0.30, 0.40, 0.30)
+                MainGoal.GAIN_MUSCLE -> Triple(0.30, 0.45, 0.25)
+                MainGoal.MAINTAIN_WEIGHT -> Triple(0.25, 0.50, 0.25)
+                MainGoal.BOOST_ENERGY -> Triple(0.20, 0.55, 0.25)
+                MainGoal.IMPROVE_NUTRITION -> Triple(0.25, 0.45, 0.30)
+                MainGoal.GAIN_WEIGHT -> Triple(0.25, 0.55, 0.20)
+            }
         }
+        val protein = ratios.sumOf { it.first } / ratios.size
+        val carbs = ratios.sumOf { it.second } / ratios.size
+        val fat = ratios.sumOf { it.third } / ratios.size
+        return Triple(protein, carbs, fat)
     }
 }

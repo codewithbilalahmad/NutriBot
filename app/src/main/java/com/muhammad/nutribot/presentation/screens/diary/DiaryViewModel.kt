@@ -26,7 +26,7 @@ class DiaryViewModel(
             startOfDay = _state.value.selectedDate.startOfDayMillis(),
             endOfDay = _state.value.selectedDate.endOdDayMillis()
         )
-    ){state, nutritionCalculation,streak, foods ->
+    ) { state, nutritionCalculation, streak, foods ->
         state.copy(
             nutritionCalculation = nutritionCalculation,
             streak = streak,
@@ -34,10 +34,15 @@ class DiaryViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), DiaryState())
 
-    fun onAction(action: DiaryAction){
-        when(action){
+    fun onAction(action: DiaryAction) {
+        when (action) {
             is DiaryAction.OnDateSelected -> onDateSelected(action.date)
+            DiaryAction.OnToggleAddFoodBottomSheet -> onToggleAddFoodBottomSheet()
         }
+    }
+
+    private fun onToggleAddFoodBottomSheet() {
+        _state.update { it.copy(showAddFoodBottomSheet = !it.showAddFoodBottomSheet) }
     }
 
     private fun onDateSelected(date: LocalDate) {

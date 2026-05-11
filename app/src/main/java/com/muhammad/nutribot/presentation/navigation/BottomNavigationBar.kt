@@ -33,7 +33,11 @@ import com.muhammad.nutribot.R
 import com.muhammad.nutribot.utils.rippleClickable
 
 @Composable
-fun BottomNavigationBar(modifier: Modifier = Modifier, navHostController: NavHostController) {
+fun BottomNavigationBar(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
+    onAddFoodClick: () -> Unit
+) {
     val currentDestination = navHostController.currentBackStackEntryAsState().value?.destination
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Row(
@@ -63,11 +67,13 @@ fun BottomNavigationBar(modifier: Modifier = Modifier, navHostController: NavHos
             }
         }
         LargeFloatingActionButton(
-            onClick = {},
+            onClick = onAddFoodClick,
             shape = CircleShape,
-            modifier = Modifier.size(85.dp).graphicsLayer{
-                translationY = -50.dp.toPx()
-            },
+            modifier = Modifier
+                .size(85.dp)
+                .graphicsLayer {
+                    translationY = -50.dp.toPx()
+                },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
@@ -92,8 +98,8 @@ fun BottomNavigationItem(
         label = "contentColor"
     )
     Column(
-        modifier = modifier.rippleClickable {
-            navHostController.navigate(navItem.route){
+        modifier = modifier.rippleClickable(enabled = !isSelected){
+            navHostController.navigate(navItem.route) {
                 popUpTo(navHostController.graph.findStartDestination().id) {
                     saveState = true
                 }

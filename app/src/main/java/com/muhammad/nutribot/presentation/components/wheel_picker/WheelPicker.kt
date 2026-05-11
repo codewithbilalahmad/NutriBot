@@ -44,9 +44,9 @@ fun WheelPicker(
     modifier: Modifier = Modifier,
     range: IntRange,
     initialValue: Int,
-    selectedTextStyle : TextStyle = MaterialTheme.typography.titleMedium,
-    unSelectedTextStyle : TextStyle = MaterialTheme.typography.titleMedium,
-    @StringRes label : Int,
+    selectedTextStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    unSelectedTextStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    @StringRes label: Int,
     visibleItemsCount: Int = 5,
     itemHeight: Dp = 40.dp,
     onItemSelected: (Int) -> Unit,
@@ -61,7 +61,11 @@ fun WheelPicker(
         List(paddingItemCount) { null } + actualItems + List(paddingItemCount) { null }
     }
     val pickerHeight = itemHeight * visibleItemsCount
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialValue - 1)
+    val safeInitialValue = initialValue.coerceIn(range.first, range.last)
+    val initialIndex = remember(safeInitialValue, paddingItemCount) {
+        safeInitialValue - range.first
+    }
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
     val firstVisibleItemIndex = remember {
         derivedStateOf { listState.firstVisibleItemIndex }
     }
@@ -88,7 +92,6 @@ fun WheelPicker(
                 if (item == null) {
                     Spacer(Modifier.height(itemHeight))
                 } else {
-                    val isSelected = index == centerIndex
                     val distanceFromCamera = (index - centerIndex) - (offset / itemHeightPx)
                     val alpha = max(0.5f, 1f - abs(distanceFromCamera) * 0.5f)
                     val angle = distanceFromCamera * 18f
@@ -107,7 +110,7 @@ fun WheelPicker(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${item.toString()} ${stringResource(label)}",
+                            text = "$item ${stringResource(label)}",
                             style = unSelectedTextStyle.copy(
                                 textAlign = TextAlign.Center,
                                 color = MaterialTheme.colorScheme.surface
@@ -125,14 +128,16 @@ fun WheelPicker(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 )
-                .background(MaterialTheme.colorScheme.surfaceContainer,RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(16.dp))
                 .padding(horizontal = 32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically){  }
-            val item = items[centerIndex]
+            Row(verticalAlignment = Alignment.CenterVertically) { }
+            val item = items.getOrNull(centerIndex)
             Text(
-                text = "${item.toString()} ${stringResource(label)}",
+                text = item?.let {
+                    "$it ${stringResource(label)}"
+                }.orEmpty(),
                 style = selectedTextStyle.copy(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,

@@ -12,6 +12,8 @@ sealed interface Destination {
     @Serializable
     data object DiaryScreen : Destination
     @Serializable
+    data object ScanMealScreen : Destination
+    @Serializable
     data object ProgressScreen : Destination
     @Serializable
     data object SettingScreen : Destination

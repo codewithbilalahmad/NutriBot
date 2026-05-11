@@ -39,6 +39,7 @@ interface FoodDao{
         """
     )
      fun getFoodDates() : Flow<List<String>>
+     @Transaction
     @Query(
         "SELECT * FROM FoodEntity WHERE id =:id ORDER BY eatenAt DESC"
     )

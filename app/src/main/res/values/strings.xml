@@ -79,4 +79,8 @@
     <string name="what_is_your_lifecycle">What\'s your lifestyle like?</string>
     <string name="what_is_your_lifecycle_desp">Not counting workouts - we\'ll about those separately</string>
     <string name="prefer_not_to_say">Prefer not to say</string>
+    <string name="gallery">Gallery</string>
+    <string name="food_database">Food Database</string>
+    <string name="favourites">Favourites</string>
+    <string name="scan_meal">Scan Meal</string>
 </resources>

@@ -13,5 +13,6 @@ data class Food(
     val carbs : Int,
     val numberOfServings : Int,
     val eatenAt : Instant,
+    val confidenceScore : Int,
     val ingredients: List<Ingredient>
 )
