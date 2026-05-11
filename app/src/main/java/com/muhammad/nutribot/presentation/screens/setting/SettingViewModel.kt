@@ -2,6 +2,8 @@ package com.muhammad.nutribot.presentation.screens.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.muhammad.nutribot.domain.model.UserProfile
+import com.muhammad.nutribot.domain.repository.nutrition_calculation.NutritionCalculationRepository
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +15,7 @@ import kotlinx.coroutines.launch
 
 class SettingViewModel(
     private val settingRepository: SettingRepository,
+    private val nutritionCalculationRepository: NutritionCalculationRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SettingState())
     val state = combine(
@@ -30,6 +33,22 @@ class SettingViewModel(
             SettingAction.OnToggleGenderSection -> onToggleGenderSection()
             SettingAction.OnToggleHeightAndWeightSection -> onToggleHeightAndWeightSection()
             is SettingAction.OnToggleReminderEnabled -> onToggleReminderEnabled(action.enable)
+            is SettingAction.OnChangeProfile -> onChangeProfile(action.profile)
+        }
+    }
+
+    private fun onChangeProfile(profile: UserProfile) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val nutritionCalculation = nutritionCalculationRepository.calculateNutrition(
+                gender = profile.gender,
+                activityLevel = profile.activityLevel,
+                weightKg = profile.weightKg,
+                heightCm = profile.heightCm,
+                age = profile.age,
+                mainGoals = profile.mainGoal
+            )
+            settingRepository.saveUserProfile(profile)
+            settingRepository.saveNutritionCalculation(nutritionCalculation)
         }
     }
 

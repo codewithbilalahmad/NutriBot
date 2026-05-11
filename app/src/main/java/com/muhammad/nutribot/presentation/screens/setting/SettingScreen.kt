@@ -323,7 +323,12 @@ fun SettingScreen(
                     Spacer(Modifier.weight(1f))
                     PrimaryButton(
                         text = stringResource(R.string.save),
-                        onClick = {},
+                        onClick = {
+                            state.userProfile?.let { profile ->
+                                viewModel.onAction(SettingAction.OnToggleGenderSection)
+                                viewModel.onAction(SettingAction.OnChangeProfile(profile.copy(gender = selectedGender)))
+                            }
+                        },
                         enabled = selectedGender != state.gender,
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(vertical = 16.dp)
@@ -377,7 +382,12 @@ fun SettingScreen(
                     Spacer(Modifier.weight(1f))
                     PrimaryButton(
                         text = stringResource(R.string.save),
-                        onClick = {},
+                        onClick = {
+                            state.userProfile?.let { profile ->
+                                viewModel.onAction(SettingAction.OnToggleAgeSection)
+                                viewModel.onAction(SettingAction.OnChangeProfile(profile.copy(age = selectedAge)))
+                            }
+                        },
                         enabled = selectedAge != state.age,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -469,7 +479,12 @@ fun SettingScreen(
                     Spacer(Modifier.weight(1f))
                     PrimaryButton(
                         text = stringResource(R.string.save),
-                        onClick = {},
+                        onClick = {
+                            state.userProfile?.let { profile ->
+                                viewModel.onAction(SettingAction.OnToggleHeightAndWeightSection)
+                                viewModel.onAction(SettingAction.OnChangeProfile(profile.copy(heightCm = selectedHeight, weightKg = selectedWeight)))
+                            }
+                        },
                         enabled = selectedHeight != state.height || selectedWeight != state.weight,
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(vertical = 16.dp)
@@ -515,7 +530,12 @@ fun SettingScreen(
                     Spacer(Modifier.weight(1f))
                     PrimaryButton(
                         text = stringResource(R.string.save),
-                        onClick = {},
+                        onClick = {
+                            state.userProfile?.let { profile ->
+                                viewModel.onAction(SettingAction.OnToggleActivityLevelSection)
+                                viewModel.onAction(SettingAction.OnChangeProfile(profile.copy(activityLevel = selectedActivityLevel)))
+                            }
+                        },
                         enabled = selectedActivityLevel != state.activityLevel,
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(vertical = 16.dp)
