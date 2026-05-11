@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.screens.diary.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,11 +75,16 @@ fun DiaryTopbar(
                             Alignment.CenterHorizontally
                         )
                     ) {
+                        val tint by animateColorAsState(
+                            targetValue = if(streak > 0) Color.Unspecified else MaterialTheme.colorScheme.surface,
+                            animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
+                            label = "tint"
+                        )
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.ic_streak),
                             contentDescription = null,
                             modifier = Modifier.size(20.dp),
-                            tint = Color.Unspecified
+                            tint = tint
                         )
                         Text(
                             text = "$streak",

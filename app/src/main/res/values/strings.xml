@@ -78,4 +78,5 @@
     <string name="gain_weight_desp">Increase weight in a healthy way</string>
     <string name="what_is_your_lifecycle">What\'s your lifestyle like?</string>
     <string name="what_is_your_lifecycle_desp">Not counting workouts - we\'ll about those separately</string>
+    <string name="prefer_not_to_say">Prefer not to say</string>
 </resources>

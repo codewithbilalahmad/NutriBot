@@ -109,7 +109,7 @@ fun WelcomeScreen(navController: NavHostController) {
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.welcome_desp),
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         textAlign = TextAlign.Center
                     )

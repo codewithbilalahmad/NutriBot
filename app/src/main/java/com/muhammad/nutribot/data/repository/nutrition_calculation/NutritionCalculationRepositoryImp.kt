@@ -58,6 +58,7 @@ class NutritionCalculationRepositoryImp : NutritionCalculationRepository {
         return when (gender) {
             Gender.MALE -> 10 * weightKg + 6.25 * heightCm - 5 * age + 5
             Gender.FEMALE -> 10 * weightKg + 6.25 * heightCm - 5 * age - 161
+            Gender.PREFER_NOT_TO_SAY -> 0.0
         }
     }
 

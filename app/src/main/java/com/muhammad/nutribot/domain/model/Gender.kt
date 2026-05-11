@@ -20,4 +20,9 @@ enum class Gender(
         icon = R.drawable.ic_female,
         emoji = "👩"
     ),
+    PREFER_NOT_TO_SAY(
+        value = R.string.prefer_not_to_say,
+        icon = R.drawable.ic_question,
+        emoji = "⁉"
+    )
 }
