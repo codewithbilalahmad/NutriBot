@@ -7,4 +7,6 @@ object Constants {
     const val NUTRITION_CALCULATION_PREF_KEY = "nutrition_calculation"
     const val IS_USER_LOGGED_IN_PREF_KEY = "is_user_logged_in"
     const val IS_REMINDER_ENABLE_PREF_KEY = "is_reminder_enable"
+    const val GEMINI_API_KEY = "AIzaSyDWW69ZNMdHbtdkRFZL4QpvMPhc4IsbTLY"
+    const val GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
 }
