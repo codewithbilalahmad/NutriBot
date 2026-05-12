@@ -34,7 +34,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 AppNavigation(
                     navController = navController,
-                    isUserLoggedIn = state.isUserLoggedIn == true
+                    isUserLoggedIn = state.isUserLoggedIn == true,
+                    isInternetConnected = state.isInternetConnected == true
                 )
             }
         }

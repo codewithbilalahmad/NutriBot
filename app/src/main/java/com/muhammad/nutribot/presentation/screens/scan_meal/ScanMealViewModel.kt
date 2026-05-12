@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class ScanMealViewModel(
-    private val cameraController: CameraController,
+    val cameraController: CameraController,
 ) : ViewModel() {
     private val context = NutriBotApplication.INSTANCE
     private val json = Json {

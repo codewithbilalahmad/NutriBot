@@ -1,14 +1,17 @@
 package com.muhammad.nutribot.presentation.screens.scan_meal
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,17 +19,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,7 +58,12 @@ import com.muhammad.nutribot.utils.checkPermissionGranted
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import com.muhammad.nutribot.R
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.CameraPreview
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.MealCorneredBox
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.ScanMealBottomBar
+import com.muhammad.nutribot.presentation.theme.NutriBotTheme
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun ScanMealScreen(
     navHostController: NavHostController,
@@ -53,18 +71,19 @@ fun ScanMealScreen(
     viewModel: ScanMealViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val controller = viewModel.cameraController
     val scope = rememberCoroutineScope()
     val infiniteTransition = rememberInfiniteTransition()
     val snackbarHostState = remember { SnackbarHostState() }
     val layoutDirection = LocalLayoutDirection.current
+    val configuration = LocalConfiguration.current
     val context = LocalContext.current
     val lifeCycleOwner = LocalLifecycleOwner.current
     val activity = context as Activity
     var cameraPermissionGranted by remember {
         mutableStateOf(checkPermissionGranted(context, Manifest.permission.CAMERA))
     }
-    val photoPickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+    val photoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 viewModel.onAction(ScanMealAction.OnPickMealGalleryImage(uri.toString()))
             }
@@ -116,52 +135,106 @@ fun ScanMealScreen(
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    Scaffold(
-        modifier = Modifier.fillMaxSize(), snackbarHost = {
-            GradientSnackbarHost(snackbarHostState)
-        }
-    ) {paddingValues ->
-        if(cameraPermissionGranted){
+    NutriBotTheme(darkTheme = true) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(), snackbarHost = {
+                GradientSnackbarHost(snackbarHostState)
+            }, topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
 
-        } else{
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.camera_photo),
-                    contentDescription = null,
-                    modifier = Modifier.size(180.dp)
+                            },
+                            shapes = IconButtonDefaults.shapes(),
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = if (cameraPermissionGranted) MaterialTheme.colorScheme.background.copy(
+                                    0.6f
+                                ) else MaterialTheme.colorScheme.surfaceContainer
+                            )
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    title = {},
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
                 )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.allow_app_to_access_your_camera),
+            }, bottomBar = {
+                ScanMealBottomBar(
+                    isFlashOn = state.isFlashOn,
+                    enabled = cameraPermissionGranted,
+                    onCaptureMealPhoto = {})
+            }
+        ) { paddingValues ->
+            if (cameraPermissionGranted) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.80f),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
+                        .fillMaxSize()
+                        .padding(
+                            start = paddingValues.calculateLeftPadding(layoutDirection),
+                            end = paddingValues.calculateEndPadding(layoutDirection)
+                        )
+                ) {
+                    CameraPreview(
+                        modifier = Modifier.fillMaxSize(), previewView = controller.previewView
                     )
-                )
-                Spacer(Modifier.height(20.dp))
-                Text(
-                    text = stringResource(R.string.allow_app_to_access_your_camera_desp),
-                    modifier = Modifier.fillMaxWidth(0.85f),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.surface,
-                        textAlign = TextAlign.Center
+                    if (state.isCameraLoading) {
+                        LoadingIndicator(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    } else {
+                        MealCorneredBox(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .height(configuration.screenHeightDp.dp * 0.4f)
+                                .align(Alignment.Center)
+                        )
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.camera_photo),
+                        contentDescription = null,
+                        modifier = Modifier.size(180.dp)
                     )
-                )
-                Spacer(Modifier.height(30.dp))
-                CameraPermissionCard(
-                    cameraPermissionGranted = cameraPermissionGranted,
-                    modifier = Modifier.fillMaxWidth(0.9f),
-                    onRequestCameraPermission = {
-                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                    })
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.allow_app_to_access_your_camera),
+                        modifier = Modifier
+                            .fillMaxWidth(0.80f),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Spacer(Modifier.height(20.dp))
+                    Text(
+                        text = stringResource(R.string.allow_app_to_access_your_camera_desp),
+                        modifier = Modifier.fillMaxWidth(0.85f),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.surface,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                    Spacer(Modifier.height(30.dp))
+                    CameraPermissionCard(
+                        cameraPermissionGranted = cameraPermissionGranted,
+                        modifier = Modifier.fillMaxWidth(0.9f),
+                        onRequestCameraPermission = {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        })
+                }
             }
         }
     }

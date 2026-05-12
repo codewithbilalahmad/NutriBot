@@ -37,7 +37,7 @@ fun CameraPermissionCard(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(width = 1.5.dp, color = MaterialTheme.colorScheme.surfaceVariant),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {

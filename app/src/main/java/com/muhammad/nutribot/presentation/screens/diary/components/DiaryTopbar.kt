@@ -81,7 +81,7 @@ fun DiaryTopbar(
                             label = "tint"
                         )
                         Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_streak),
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_calories),
                             contentDescription = null,
                             modifier = Modifier.size(20.dp),
                             tint = tint

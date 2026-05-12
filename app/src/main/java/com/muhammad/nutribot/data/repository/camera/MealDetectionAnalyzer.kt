@@ -45,7 +45,7 @@ class MealDetectionAnalyzer(
 
                 if (isCar != lastResult) {
                     lastResult = isCar
-                    onCarDetected(isCar)
+                    onMealDetected(isCar)
                 }
             }
             .addOnFailureListener {

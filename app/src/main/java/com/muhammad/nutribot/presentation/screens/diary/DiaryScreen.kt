@@ -108,7 +108,9 @@ fun DiaryScreen(navHostController: NavHostController, viewModel: DiaryViewModel 
                     modifier = Modifier.weight(1f),
                     label = R.string.scan_meal,
                     icon = R.drawable.ic_scan_meal,
-                    onClick = {})
+                    onClick = {
+                        navHostController.navigate(Destination.ScanMealScreen)
+                    })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
                     label = R.string.gallery,
