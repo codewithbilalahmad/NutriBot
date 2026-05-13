@@ -38,5 +38,8 @@ fun AppNavigation(
                 isInternetConnected = isInternetConnected
             )
         }
+        composable<Destination.ProgressScreen> {
+
+        }
     }
 }

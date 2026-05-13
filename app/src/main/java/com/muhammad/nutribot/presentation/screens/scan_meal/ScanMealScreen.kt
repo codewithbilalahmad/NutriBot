@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -230,8 +231,9 @@ fun ScanMealScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
+                                    .navigationBarsPadding()
                                     .padding(horizontal = 24.dp, vertical = 16.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 LoadingIndicator(color = MaterialTheme.colorScheme.onBackground)
                                 Text(
