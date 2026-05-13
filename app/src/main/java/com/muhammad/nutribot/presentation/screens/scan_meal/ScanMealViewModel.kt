@@ -9,7 +9,9 @@ import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
 import com.muhammad.nutribot.NutriBotApplication
 import com.muhammad.nutribot.R
-import com.muhammad.nutribot.domain.model.Food
+import com.muhammad.nutribot.domain.model.ScanOption
+import com.muhammad.nutribot.domain.model.ScannedMeal
+import com.muhammad.nutribot.domain.model.toFood
 import com.muhammad.nutribot.domain.repository.camera.CameraController
 import com.muhammad.nutribot.utils.Constants.GEMINI_API_KEY
 import com.muhammad.nutribot.utils.Constants.GEMINI_MODEL_NAME
@@ -33,6 +35,7 @@ class ScanMealViewModel(
     val cameraController: CameraController,
 ) : ViewModel() {
     private val context = NutriBotApplication.INSTANCE
+    private var analyzingStepJob: Job? = null
     private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
@@ -44,7 +47,6 @@ class ScanMealViewModel(
     val events = _events.receiveAsFlow()
     private val _snackbarEvents = Channel<SnackbarEvent>()
     val snackbarEvents = _snackbarEvents.receiveAsFlow()
-    private var captureJob: Job? = null
     private val generativeModel: GenerativeModel
 
     init {
@@ -64,7 +66,12 @@ class ScanMealViewModel(
             is ScanMealAction.OnStartCamera -> onStartCamera(action.lifecycleOwner)
             ScanMealAction.OnToggleFlash -> onToggleFlash()
             ScanMealAction.OnToggleCameraPermissionPermanentlyDeniedDialog -> onToggleCameraPermissionPermanentlyDeniedDialog()
+            is ScanMealAction.OnScanMealOptionChange -> onScanMealOptionChange(action.scanOption)
         }
+    }
+
+    private fun onScanMealOptionChange(scanOption: ScanOption) {
+        _state.update { it.copy(scanOption = scanOption) }
     }
 
     private fun onToggleCameraPermissionPermanentlyDeniedDialog() {
@@ -72,26 +79,26 @@ class ScanMealViewModel(
     }
 
     private fun onStartCamera(lifecycleOwner: LifecycleOwner) {
-        cameraController.startCamera(lifecycleOwner = lifecycleOwner, onCameraBinding = {
-            _state.update { it.copy(isCameraLoading = true) }
-        }, onCameraBindSuccess = {
-            _state.update { it.copy(isCameraLoading = false) }
-        }, onMealDetected = {isMealPhoto ->
-            if(isMealPhoto){
-                if(captureJob?.isActive == true) return@startCamera
-                captureJob = viewModelScope.launch {
-                    delay(1500)
-                    onCaptureMealPhoto()
+        cameraController.startCamera(
+            lifecycleOwner = lifecycleOwner,
+            onCameraBinding = {
+                _state.update { it.copy(isCameraLoading = true) }
+            },
+            onCameraBindSuccess = {
+                _state.update { it.copy(isCameraLoading = false) }
+            },
+            onMealDetected = { mealDetected ->
+
+                _state.update {
+                    it.copy(mealDetected = mealDetected)
                 }
-            } else{
-                captureJob?.cancel()
             }
-        })
+        )
     }
 
     private fun onPickMealGalleryImage(uri: String) {
         val bitmap = decodeBitmap(uri) ?: return
-        detectImageContainsMeal(bitmap =bitmap, onResult = { isMealPhoto ->
+        detectImageContainsMeal(bitmap = bitmap, onResult = { isMealPhoto ->
             if (isMealPhoto) {
                 analyzeMeal(bitmap)
             } else {
@@ -128,92 +135,74 @@ class ScanMealViewModel(
     private fun analyzeMeal(bitmap: Bitmap) {
         viewModelScope.launch {
             try {
-                _state.update { it.copy(isAnalyzingMeal = true) }
+                _state.update {
+                    it.copy(
+                        mealBitmap = bitmap,
+                        isAnalyzingMeal = true,
+                        analyzingMealStepIndex = 0
+                    )
+                }
+                cameraController.stopCamera()
+                analyzingStepJob?.cancel()
+
+                analyzingStepJob = viewModelScope.launch {
+
+                    while (true) {
+
+                        delay(2000)
+
+                        _state.update { current ->
+
+                            val nextIndex =
+                                if (current.analyzingMealStepIndex >= current.analyzingMealSteps.lastIndex) {
+                                    0
+                                } else {
+                                    current.analyzingMealStepIndex + 1
+                                }
+
+                            current.copy(
+                                analyzingMealStepIndex = nextIndex
+                            )
+                        }
+                    }
+                }
+                val resizedBitmap = resizeBitmap(bitmap)
                 val prompt = """
-You are an expert AI nutrition assistant.
+Analyze this food image for a nutrition tracking app.
 
-Analyze this food image carefully and identify all visible foods and ingredients.
+Return ONLY valid JSON.
 
-STEP 1:
-Determine if this image contains real food.
-If not, return:
-{
-  "foods": [],
-  "confidenceScore": 0
-}
-
-STEP 2:
-Identify each visible food item separately.
-
-Examples:
-- rice
-- fried egg
-- grilled chicken
-- fish curry
-- salad
-- fries
-
-STEP 3:
-For each food item, estimate realistic nutritional values:
-- calories
-- protein
-- fat
-- carbs
-
-STEP 4:
-If a food contains multiple ingredients or mixed items, extract them separately.
-
-Examples:
-- chicken rice bowl → chicken, rice, sauce
-- burger → bun, beef patty, cheese
-- fish curry → fish, curry sauce, rice
-
-STEP 5:
-Estimate:
-- total calories
-- protein
-- fat
-- carbs
-
-Return STRICT JSON ONLY.
-
-Format:
+FORMAT:
 
 {
-  "foods": [
+  "name": "",
+  "calories": 0,
+  "protein": 0,
+  "fat": 0,
+  "carbs": 0,
+  "confidenceScore": 85,
+  "ingredients": [
     {
       "name": "",
       "calories": 0,
       "protein": 0,
       "fat": 0,
       "carbs": 0,
-      "ingredients": [
-        {
-          "name": "",
-          "calories": 0,
-          "protein": 0,
-          "fat": 0,
-          "carbs": 0
-        }
-      ]
+      "isSelected": true
     }
-  ],
-  "confidenceScore": 0
+  ]
 }
 
-IMPORTANT RULES:
-- Return ONLY valid JSON
+RULES:
+- confidenceScore MUST be INTEGER between 0 and 100 (example: 85, NOT 0.85)
+- Never use decimals for confidenceScore
+- Only visible food items
+- Split mixed meals into ingredients
+- No extra fields
 - No markdown
-- No explanation text
-- No null values
-- Use 0 for unknown numeric values
-- Use realistic nutrition estimates
-- Use only visible food information
-- confidenceScore must be 0–100
-- calories, protein, fat, carbs must be integers
-- ingredients must always exist (use empty array if needed)
+- No explanation
+- Always return valid JSON
 """.trimIndent()
-                val resizedBitmap = resizeBitmap(bitmap)
                 val inputContent = content {
                     image(resizedBitmap)
                     text(prompt)
@@ -221,8 +210,8 @@ IMPORTANT RULES:
                 val response = generativeModel.generateContent(inputContent)
                 val rawText = response.text ?: ""
                 val cleaned = cleanJson(rawText)
-                val food = parseFood(cleaned)
-                if (food == null || food.confidenceScore < 70) {
+                val meal = parseScannedMeal(cleaned)
+                if (meal == null) {
                     _snackbarEvents.trySend(
                         SnackbarEvent.ShowSnackbar(
                             message = context.getString(R.string.low_confidence_result),
@@ -231,9 +220,8 @@ IMPORTANT RULES:
                     )
                 } else {
                     val mealImageUrl = saveBitmapToFile(bitmap, "meal")
-                    val finalFood =
-                        food.copy(id = System.currentTimeMillis(), mealImageUrl = mealImageUrl)
-                    _events.trySend(ScanMealEvent.OnMealAnalyzedSuccess(finalFood))
+                    val food = meal.toFood(mealImageUrl = mealImageUrl)
+                    _events.trySend(ScanMealEvent.OnMealAnalyzedSuccess(food))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -244,14 +232,19 @@ IMPORTANT RULES:
                     )
                 )
             } finally {
-                _state.update { it.copy(isAnalyzingMeal = false) }
+                _state.update { it.copy(isAnalyzingMeal = false,analyzingMealStepIndex = 0) }
             }
         }
     }
 
-    private fun parseFood(jsonString: String): Food? {
+    private fun parseScannedMeal(jsonString: String): ScannedMeal? {
         return try {
-            json.decodeFromString<Food>(jsonString)
+            val cleanedJson =
+                jsonString.replace(Regex("\"confidenceScore\"\\s*:\\s*(\\d+)\\.(\\d+)")) {
+                    val intValue = it.groupValues[1]
+                    "\"confidenceScore\": $intValue"
+                }
+            json.decodeFromString<ScannedMeal>(cleanedJson)
         } catch (e: Exception) {
             e.printStackTrace()
             null

@@ -92,4 +92,9 @@
     <string name="allow_app_to_access_your_camera">Allow NutriBot to access your Camera</string>
     <string name="allow_app_to_access_your_camera_desp">Take a photo of a meal to access detailed information instantly. Your preferences can be updated anytime in your device settings.</string>
     <string name="scan_meal">Scan Meal</string>
+    <string name="analyzing_your_meal">Analyzing your meal...</string>
+    <string name="detecting_ingredients">Detecting ingredients...</string>
+    <string name="evaluating_nutritional_values">Evaluating nutritional values...</string>
+    <string name="checking_food_data">Checking food data...</string>
+    <string name="finalizing_insights">Finalizing insights...</string>
 </resources>

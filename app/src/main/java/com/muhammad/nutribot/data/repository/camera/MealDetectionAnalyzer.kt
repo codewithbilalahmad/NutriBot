@@ -12,46 +12,61 @@ import com.muhammad.nutribot.utils.MEAL_LABELS
 class MealDetectionAnalyzer(
     private val onMealDetected: (Boolean) -> Unit,
 ) : ImageAnalysis.Analyzer {
+
     private val labeler by lazy {
         val options = ImageLabelerOptions.Builder()
             .setConfidenceThreshold(0.6f)
             .build()
+
         ImageLabeling.getClient(options)
     }
 
     private var lastResult = false
+    private var isProcessing = false
 
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
+
+        if (isProcessing) {
+            imageProxy.close()
+            return
+        }
+
         val mediaImage = imageProxy.image
+
         if (mediaImage == null) {
             imageProxy.close()
             return
         }
-        val rotation = imageProxy.imageInfo.rotationDegrees
+
+        isProcessing = true
+
         val image = InputImage.fromMediaImage(
             mediaImage,
-            rotation
+            imageProxy.imageInfo.rotationDegrees
         )
+
         labeler.process(image)
             .addOnSuccessListener { labels ->
 
-                val isCar = labels.any { label ->
+                val isMeal = labels.any { label ->
                     val text = label.text.lowercase()
+
                     MEAL_LABELS.any { keyword ->
                         text.contains(keyword)
                     }
                 }
 
-                if (isCar != lastResult) {
-                    lastResult = isCar
-                    onMealDetected(isCar)
+                if (isMeal != lastResult) {
+                    lastResult = isMeal
+                    onMealDetected(isMeal)
                 }
             }
             .addOnFailureListener {
                 it.printStackTrace()
             }
             .addOnCompleteListener {
+                isProcessing = false
                 imageProxy.close()
             }
     }

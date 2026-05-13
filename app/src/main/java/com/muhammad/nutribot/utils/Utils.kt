@@ -22,6 +22,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 val MEAL_LABELS = listOf(
     "food",
@@ -178,14 +179,19 @@ fun getWeekDatesFrom(date: LocalDate): List<LocalDate> {
 }
 
 fun cleanJson(raw: String): String {
-    val start = raw.indexOf("{")
-    val end = raw.lastIndexOf("}")
-
-    return if (start != -1 && end != -1) {
-        raw.substring(start, end + 1)
-    } else {
-        raw
-    }
+    return raw
+        .replace("```json", "")
+        .replace("```", "")
+        .trim()
+        .let {
+            val start = it.indexOf("{")
+            val end = it.lastIndexOf("}")
+            if (start != -1 && end != -1 && end > start) {
+                it.substring(start, end + 1)
+            } else {
+                it
+            }
+        }
 }
 
 fun checkPermissionGranted(context: Context, permission: String): Boolean {
@@ -223,3 +229,5 @@ fun resizeBitmap(bitmap: Bitmap): Bitmap {
     val height = (bitmap.height * ratio).toInt()
     return Bitmap.createScaledBitmap(bitmap, width, height, true)
 }
+
+fun generateId(): Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE

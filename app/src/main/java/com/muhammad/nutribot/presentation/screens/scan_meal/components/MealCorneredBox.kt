@@ -26,7 +26,7 @@ fun MealCorneredBox(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     strokeWidth: Dp = 4.dp,
     cornerLength: Dp = 80.dp,
-    cornerRadius: Dp = 80.dp,
+    cornerRadius: Dp = 60.dp,
     shape: Shape = RoundedCornerShape(24.dp),
     content: @Composable () -> Unit = {},
 ) {
