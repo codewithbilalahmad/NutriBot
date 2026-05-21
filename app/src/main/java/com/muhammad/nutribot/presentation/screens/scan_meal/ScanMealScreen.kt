@@ -10,9 +10,9 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -88,10 +89,10 @@ fun ScanMealScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     viewModel: ScanMealViewModel = koinViewModel(),
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val controller = viewModel.cameraController
     val scope = rememberCoroutineScope()
-    val infiniteTransition = rememberInfiniteTransition()
     val snackbarHostState = remember { SnackbarHostState() }
     val layoutDirection = LocalLayoutDirection.current
     val configuration = LocalConfiguration.current
@@ -119,6 +120,13 @@ fun ScanMealScreen(
                 viewModel.onAction(ScanMealAction.OnToggleCameraPermissionPermanentlyDeniedDialog)
             }
         }
+    DisposableEffect(Unit) {
+        onDispose {
+            val window = activity.window
+            WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDarkTheme
+            WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isDarkTheme
+        }
+    }
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is ScanMealEvent.OnMealAnalyzedSuccess -> {
@@ -255,7 +263,7 @@ fun ScanMealScreen(
                                     .height(configuration.screenHeightDp.dp * 0.4f)
                                     .padding(horizontal = 24.dp)
                                     .align(Alignment.Center),
-                                isAnalyzingMeal = state.isAnalyzingMeal
+                                isAnalyzingMeal = true
                             )
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -265,7 +273,7 @@ fun ScanMealScreen(
                                     .padding(horizontal = 24.dp, vertical = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                LoadingIndicator(color = MaterialTheme.colorScheme.onBackground)
+                                LoadingIndicator(color = MaterialTheme.colorScheme.primary)
                                 Text(
                                     text = stringResource(state.currentAnalyzingMealStep),
                                     style = MaterialTheme.typography.titleSmall.copy(
@@ -299,7 +307,7 @@ fun ScanMealScreen(
                                     .fillMaxWidth()
                                     .height(configuration.screenHeightDp.dp * 0.4f)
                                     .padding(horizontal = 24.dp)
-                                    .align(Alignment.Center), isAnalyzingMeal = true
+                                    .align(Alignment.Center), isAnalyzingMeal = false
                             )
                         }
                     }

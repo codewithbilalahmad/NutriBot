@@ -2,7 +2,6 @@ package com.muhammad.nutribot.presentation.screens.scan_meal.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
-import com.muhammad.nutribot.R
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -12,11 +11,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -30,9 +28,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -63,18 +58,6 @@ fun MealCorneredBox(
         ),
         label = "scanner_progress"
     )
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 2000,
-                easing = FastOutSlowInEasing
-            ),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "rotation"
-    )
     Box(
         modifier = modifier
             .background(containerColor, shape)
@@ -84,9 +67,8 @@ fun MealCorneredBox(
 
                 if (isAnalyzingMeal) {
 
-                    val scannerHeight = size.height * 0.5f
-                    val y =
-                        (size.height - scannerHeight - strokeWidth.toPx() * 2) * animatedProgress
+                    val scannerHeight = size.height * 0.4f
+                    val y = (size.height - scannerHeight - strokeWidth.toPx() * 2) * animatedProgress
                     drawRoundRect(
                         brush = Brush.verticalGradient(
                             colors = listOf(
@@ -137,7 +119,7 @@ fun MealCorneredBox(
                         )
                         lineTo(
                             x = startX,
-                            y = startY + (radius * vDir)
+                            y = startY + (length * vDir)
                         )
                     }
                     drawPath(
@@ -178,20 +160,8 @@ fun MealCorneredBox(
                     .fillMaxSize()
                     .padding(20.dp), contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_sparkles),
-                    tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = null, modifier = Modifier.graphicsLayer {
-                        rotationZ = rotation
-                    }.size(30.dp).align(Alignment.TopEnd)
-                )
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_sparkles),
-                    tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = null, modifier = Modifier.graphicsLayer {
-                        rotationZ = rotation
-                    }.size(26.dp).align(Alignment.BottomStart)
-                )
+                Sparkles(modifier = Modifier.align(Alignment.TopEnd), size = 40.dp)
+                Sparkles(modifier = Modifier.align(Alignment.BottomStart), size = 35.dp)
             }
         }
     }

@@ -3,7 +3,9 @@ package com.muhammad.nutribot.data.reminders
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
@@ -11,7 +13,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.muhammad.nutribot.MainActivity
 import com.muhammad.nutribot.R
+import com.muhammad.nutribot.utils.Constants.BREAKFAST_REMINDER
+import com.muhammad.nutribot.utils.Constants.DINNER_REMINDER
+import com.muhammad.nutribot.utils.Constants.LUNCH_REMINDER
 import com.muhammad.nutribot.utils.Constants.MEAL_REMINDER_CHANNEL
 import com.muhammad.nutribot.utils.Constants.MEAL_REMINDER_NAME
 import com.muhammad.nutribot.utils.Constants.MEAL_TYPE
@@ -32,7 +38,7 @@ class MealReminderWorker(
         }
         val contentTexts = when (mealType) {
 
-            "Breakfast" -> listOf(
+            BREAKFAST_REMINDER -> listOf(
                 "Start your day with a healthy breakfast 🍳",
                 "Good morning! Don’t forget to track your breakfast ☀️",
                 "Fuel your morning with a nutritious meal 🥗",
@@ -45,7 +51,7 @@ class MealReminderWorker(
                 "Healthy mornings begin with smart eating 🍓"
             )
 
-            "Lunch" -> listOf(
+            LUNCH_REMINDER -> listOf(
                 "Lunch time! Refuel your energy 🍛",
                 "Don’t skip lunch — track your calories 🍱",
                 "Keep your nutrition balanced this afternoon 🥗",
@@ -58,7 +64,7 @@ class MealReminderWorker(
                 "Keep crushing your calorie goals this afternoon 💪"
             )
 
-            "Dinner" -> listOf(
+            DINNER_REMINDER -> listOf(
                 "Dinner time! Finish your day healthy 🌙",
                 "Track your dinner calories before bedtime 🍲",
                 "Enjoy a balanced dinner tonight 🥘",
@@ -75,10 +81,14 @@ class MealReminderWorker(
                 "Don’t forget to track your meal 🍽️"
             )
         }
+        val activityIntent = Intent(context, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+        }
+        val activityPendingIntent = PendingIntent.getActivity( context, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val notification = NotificationCompat.Builder(context, MEAL_REMINDER_CHANNEL)
-            .setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle(
+            .setSmallIcon(R.drawable.ic_meal).setContentTitle(
                 "$mealType Reminder"
-            ).setContentText(contentTexts.random()).setPriority(NotificationCompat.PRIORITY_HIGH)
+            ).setContentText(contentTexts.random()).setContentIntent(activityPendingIntent).setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true).build()
         NotificationManagerCompat.from(context).notify(mealType.hashCode(), notification)
         return Result.success()

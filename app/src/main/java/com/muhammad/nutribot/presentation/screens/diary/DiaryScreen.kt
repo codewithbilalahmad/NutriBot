@@ -31,8 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 fun DiaryScreen(navHostController: NavHostController, viewModel: DiaryViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val weekRange = state.weekRange
-    val weekCalenderPagerState =
-        rememberPagerState(initialPage = weekRange.count() - 1) { weekRange.count() }
+    val weekCalenderPagerState = rememberPagerState(initialPage = weekRange.count() - 1) { weekRange.count() }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DiaryTopbar(
             modifier = Modifier.fillMaxWidth(),
@@ -109,23 +108,32 @@ fun DiaryScreen(navHostController: NavHostController, viewModel: DiaryViewModel 
                     label = R.string.scan_meal,
                     icon = R.drawable.ic_scan_meal,
                     onClick = {
+                        viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
                         navHostController.navigate(Destination.ScanMealScreen)
                     })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
                     label = R.string.gallery,
                     icon = R.drawable.ic_gallery,
-                    onClick = {})
+                    onClick = {
+                        viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
+                    })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
                     label = R.string.food_database,
                     icon = R.drawable.ic_diary,
-                    onClick = {})
+                    onClick = {
+                        viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
+
+                    })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
                     label = R.string.favourites,
                     icon = R.drawable.ic_favourite_filled,
-                    onClick = {})
+                    onClick = {
+                        viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
+
+                    })
             }
         })
 }

@@ -186,7 +186,9 @@ fun SettingScreen(
                                         }
 
                                         else -> {
-                                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                            }
                                         }
                                     }
                                 } else {
@@ -610,8 +612,8 @@ fun SettingScreen(
             confirmText = stringResource(R.string.confirm),
             dismissText = stringResource(R.string.discard),
             onConfirmClick = {
-                openPermissionSettings(context)
                 viewModel.onAction(SettingAction.OnToggleNotificationPermissionDeniedDialog)
+                openPermissionSettings(context)
             }, onDismissClick = {
                 viewModel.onAction(SettingAction.OnToggleNotificationPermissionDeniedDialog)
             }
