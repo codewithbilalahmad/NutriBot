@@ -1,6 +1,11 @@
 package com.muhammad.nutribot.presentation.screens.setting
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,16 +42,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.ActivityLevel
 import com.muhammad.nutribot.domain.model.Gender
+import com.muhammad.nutribot.presentation.components.alert_dialog.AppAlertDialog
 import com.muhammad.nutribot.presentation.components.button.PrimaryButton
 import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPicker
 import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPickerHorizontal
@@ -54,6 +62,8 @@ import com.muhammad.nutribot.presentation.screens.nurition_setup.components.Acti
 import com.muhammad.nutribot.presentation.screens.setting.components.GenderCard
 import com.muhammad.nutribot.presentation.screens.setting.components.SettingHeader
 import com.muhammad.nutribot.presentation.screens.setting.components.SettingItem
+import com.muhammad.nutribot.utils.checkPermissionGranted
+import com.muhammad.nutribot.utils.openPermissionSettings
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -61,7 +71,19 @@ fun SettingScreen(
     navHostController: NavHostController,
     viewModel: SettingViewModel = koinViewModel(),
 ) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            when {
+                isGranted -> {
+                    viewModel.onAction(SettingAction.OnToggleReminderEnabled(true))
+                }
+                else -> {
+                    viewModel.onAction(SettingAction.OnToggleReminderEnabled(false))
+                    viewModel.onAction(SettingAction.OnToggleNotificationPermissionDeniedDialog)
+                }
+            }
+        }
     BackHandler {
         when {
             state.showAgeSection -> {
@@ -148,7 +170,28 @@ fun SettingScreen(
                         label = R.string.enable_reminder,
                         trailingContent = {
                             Switch(checked = state.reminderEnabled, onCheckedChange = { enable ->
-                                viewModel.onAction(SettingAction.OnToggleReminderEnabled(enable))
+                                if (enable) {
+                                    when {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                            ContextCompat.checkSelfPermission(
+                                                context,
+                                                Manifest.permission.POST_NOTIFICATIONS
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        } else true -> {
+                                            viewModel.onAction(
+                                                SettingAction.OnToggleReminderEnabled(
+                                                    true
+                                                )
+                                            )
+                                        }
+
+                                        else -> {
+                                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                        }
+                                    }
+                                } else {
+                                    viewModel.onAction(SettingAction.OnToggleReminderEnabled(false))
+                                }
                             })
                         },
                         onClick = {
@@ -482,7 +525,14 @@ fun SettingScreen(
                         onClick = {
                             state.userProfile?.let { profile ->
                                 viewModel.onAction(SettingAction.OnToggleHeightAndWeightSection)
-                                viewModel.onAction(SettingAction.OnChangeProfile(profile.copy(heightCm = selectedHeight, weightKg = selectedWeight)))
+                                viewModel.onAction(
+                                    SettingAction.OnChangeProfile(
+                                        profile.copy(
+                                            heightCm = selectedHeight,
+                                            weightKg = selectedWeight
+                                        )
+                                    )
+                                )
                             }
                         },
                         enabled = selectedHeight != state.height || selectedWeight != state.weight,
@@ -522,7 +572,7 @@ fun SettingScreen(
                     )
                     Spacer(Modifier.height(24.dp))
                     ActivityLevel.entries.forEach { level ->
-                        ActivityLevelCard(activityLevel = level, onSelectActivityLevel = {level ->
+                        ActivityLevelCard(activityLevel = level, onSelectActivityLevel = { level ->
                             selectedActivityLevel = level
                         }, isSelected = selectedActivityLevel == level)
                         Spacer(Modifier.height(8.dp))
@@ -533,7 +583,13 @@ fun SettingScreen(
                         onClick = {
                             state.userProfile?.let { profile ->
                                 viewModel.onAction(SettingAction.OnToggleActivityLevelSection)
-                                viewModel.onAction(SettingAction.OnChangeProfile(profile.copy(activityLevel = selectedActivityLevel)))
+                                viewModel.onAction(
+                                    SettingAction.OnChangeProfile(
+                                        profile.copy(
+                                            activityLevel = selectedActivityLevel
+                                        )
+                                    )
+                                )
                             }
                         },
                         enabled = selectedActivityLevel != state.activityLevel,
@@ -543,5 +599,22 @@ fun SettingScreen(
                 }
             }
         }
+    }
+    if (state.showNotificationPermissionDeniedDialog) {
+        AppAlertDialog(
+            onDismiss = {
+                viewModel.onAction(SettingAction.OnToggleNotificationPermissionDeniedDialog)
+            },
+            title = stringResource(R.string.allow_reminders),
+            message = stringResource(R.string.allow_reminders_desp),
+            confirmText = stringResource(R.string.confirm),
+            dismissText = stringResource(R.string.discard),
+            onConfirmClick = {
+                openPermissionSettings(context)
+                viewModel.onAction(SettingAction.OnToggleNotificationPermissionDeniedDialog)
+            }, onDismissClick = {
+                viewModel.onAction(SettingAction.OnToggleNotificationPermissionDeniedDialog)
+            }
+        )
     }
 }

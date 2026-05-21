@@ -1,9 +1,9 @@
 package com.muhammad.nutribot.domain.model
 
 import androidx.compose.runtime.Immutable
-import kotlin.time.Clock
-import kotlin.time.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Immutable
 data class Food(
     val id : Long,
@@ -14,7 +14,8 @@ data class Food(
     val fat : Int,
     val carbs : Int,
     val numberOfServings : Int = 1,
-    val eatenAt : Instant = Clock.System.now(),
+    val eatenAt : Long,
     val confidenceScore : Int,
-    val ingredients: List<Ingredient>
+    val ingredients: List<Ingredient>,
+    val isFavorite : Boolean = false
 )

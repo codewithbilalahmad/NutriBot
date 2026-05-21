@@ -47,6 +47,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Composable
 fun WeekCalender(
@@ -62,7 +63,10 @@ fun WeekCalender(
     val hapticFeedback = LocalHapticFeedback.current
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val foodByDate = remember(foodList) {
-        foodList.groupBy { it.eatenAt.toLocalDateTime(TimeZone.currentSystemDefault()).date }
+        foodList.groupBy {
+            val eatenAt = Instant.fromEpochMilliseconds(it.eatenAt)
+            eatenAt.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        }
     }
     val isToday = selectedDate == today
     val isSameYear = selectedDate.year == today.year

@@ -97,4 +97,13 @@
     <string name="evaluating_nutritional_values">Evaluating nutritional values...</string>
     <string name="checking_food_data">Checking food data...</string>
     <string name="finalizing_insights">Finalizing insights...</string>
+    <string name="grams">g</string>
+    <string name="number_of_servings">Number of servings</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="launch">Launch</string>
+    <string name="dinner">Dinner</string>
+    <string name="allow_reminders">Allow Reminders</string>
+    <string name="allow_reminders_desp">Enable daily calorie reminders for breakfast, lunch, and dinner to help you stay consistent with your nutrition goals.</string>
+    <string name="confirm">Confirm</string>
+    <string name="discard">Discard</string>
 </resources>

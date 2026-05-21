@@ -1,20 +1,38 @@
 package com.muhammad.nutribot.presentation.screens.scan_meal.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import com.muhammad.nutribot.R
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -22,7 +40,9 @@ import androidx.compose.ui.unit.dp
 fun MealCorneredBox(
     modifier: Modifier = Modifier,
     cornerColor: Color = MaterialTheme.colorScheme.onBackground,
+    scannerColor: Color = MaterialTheme.colorScheme.primary,
     containerColor: Color = Color.Transparent,
+    isAnalyzingMeal: Boolean,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     strokeWidth: Dp = 4.dp,
     cornerLength: Dp = 80.dp,
@@ -30,10 +50,63 @@ fun MealCorneredBox(
     shape: Shape = RoundedCornerShape(24.dp),
     content: @Composable () -> Unit = {},
 ) {
-
+    val infiniteTransition = rememberInfiniteTransition(label = "scanner")
+    val animatedProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 2500,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scanner_progress"
+    )
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 2000,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "rotation"
+    )
     Box(
         modifier = modifier
             .background(containerColor, shape)
+            .drawWithContent {
+
+                drawContent()
+
+                if (isAnalyzingMeal) {
+
+                    val scannerHeight = size.height * 0.5f
+                    val y =
+                        (size.height - scannerHeight - strokeWidth.toPx() * 2) * animatedProgress
+                    drawRoundRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                scannerColor.copy(alpha = 0.1f),
+                                scannerColor.copy(alpha = 0.2f),
+                                scannerColor.copy(alpha = 0.3f),
+                                scannerColor.copy(alpha = 0.4f),
+                                scannerColor.copy(alpha = 0.5f),
+                            ),
+                            startY = 0f,
+                            endY = y
+                        ),
+                        topLeft = Offset(0f, y),
+                        size = Size(
+                            width = size.width - strokeWidth.toPx() * 2f,
+                            height = scannerHeight
+                        ), cornerRadius = CornerRadius(100f, 100f)
+                    )
+                }
+            }
             .drawBehind {
 
                 val stroke = strokeWidth.toPx()
@@ -99,5 +172,27 @@ fun MealCorneredBox(
         contentAlignment = Alignment.Center
     ) {
         content()
+        if (isAnalyzingMeal) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp), contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_sparkles),
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = null, modifier = Modifier.graphicsLayer {
+                        rotationZ = rotation
+                    }.size(30.dp).align(Alignment.TopEnd)
+                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_sparkles),
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = null, modifier = Modifier.graphicsLayer {
+                        rotationZ = rotation
+                    }.size(26.dp).align(Alignment.BottomStart)
+                )
+            }
+        }
     }
 }

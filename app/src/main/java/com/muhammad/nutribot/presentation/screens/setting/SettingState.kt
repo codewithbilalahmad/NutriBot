@@ -10,7 +10,8 @@ data class SettingState(
     val showGenderSection : Boolean = false,
     val showAgeSection : Boolean = false,
     val showHeightAndHeightSection : Boolean = false,
-    val showActivityLevelSection : Boolean = false
+    val showActivityLevelSection : Boolean = false,
+    val showNotificationPermissionDeniedDialog : Boolean = false
 ){
     val username = userProfile?.username.orEmpty()
     val gender = userProfile?.gender ?: Gender.MALE

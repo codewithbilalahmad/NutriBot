@@ -3,7 +3,6 @@ package com.muhammad.nutribot.domain.model
 import androidx.compose.runtime.Immutable
 import com.muhammad.nutribot.utils.generateId
 import kotlinx.serialization.Serializable
-import kotlin.time.Clock
 
 @Immutable
 @Serializable
@@ -29,7 +28,8 @@ fun ScannedMeal.toFood(mealImageUrl: String): Food {
         fat = fat,
         carbs = carbs,
         numberOfServings = 1,
-        eatenAt = Clock.System.now(),
+        isFavorite = false,
+        eatenAt = System.currentTimeMillis(),
         confidenceScore = confidenceScore,
         ingredients = ingredients.map {
             Ingredient(

@@ -6,7 +6,12 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,7 +36,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,25 +64,28 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.muhammad.nutribot.presentation.components.snakbar.GradientSnackbarHost
+import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.GradientSnackbarVisuals
+import com.muhammad.nutribot.presentation.components.snakbar.GradientSnackbarHost
+import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.scan_meal.components.CameraPermissionCard
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.CameraPreview
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.MealCorneredBox
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.ScanMealBottomBar
+import com.muhammad.nutribot.presentation.theme.NutriBotTheme
 import com.muhammad.nutribot.utils.ObserveAsEvents
 import com.muhammad.nutribot.utils.SnackbarEvent
 import com.muhammad.nutribot.utils.checkPermissionGranted
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
-import com.muhammad.nutribot.R
-import com.muhammad.nutribot.presentation.screens.scan_meal.components.CameraPreview
-import com.muhammad.nutribot.presentation.screens.scan_meal.components.MealCorneredBox
-import com.muhammad.nutribot.presentation.screens.scan_meal.components.ScanMealBottomBar
-import com.muhammad.nutribot.presentation.theme.NutriBotTheme
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun ScanMealScreen(
     navHostController: NavHostController,
     isInternetConnected: Boolean,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     viewModel: ScanMealViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -109,6 +123,7 @@ fun ScanMealScreen(
         when (event) {
             is ScanMealEvent.OnMealAnalyzedSuccess -> {
                 println("Meal Data : ${event.food}")
+                navHostController.navigate(Destination.MealDetailScreen(event.food))
             }
         }
     }
@@ -133,7 +148,8 @@ fun ScanMealScreen(
     DisposableEffect(lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                cameraPermissionGranted = checkPermissionGranted(context, Manifest.permission.CAMERA)
+                cameraPermissionGranted =
+                    checkPermissionGranted(context, Manifest.permission.CAMERA)
                 if (cameraPermissionGranted && !state.isAnalyzingMeal) {
                     viewModel.onAction(ScanMealAction.OnStartCamera(lifeCycleOwner))
                 }
@@ -214,18 +230,32 @@ fun ScanMealScreen(
                 if (state.isAnalyzingMeal) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         state.mealBitmap?.let { bitmap ->
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+                            with(sharedTransitionScope) {
+                                Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .sharedBounds(
+                                            sharedContentState = rememberSharedContentState(key = "meal_image"),
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                            boundsTransform = { _, _ ->
+                                                spring(
+                                                    dampingRatio = DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessMedium
+                                                )
+                                            }
+                                        ),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                             MealCorneredBox(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(configuration.screenHeightDp.dp * 0.4f)
                                     .padding(horizontal = 24.dp)
-                                    .align(Alignment.Center)
+                                    .align(Alignment.Center),
+                                isAnalyzingMeal = state.isAnalyzingMeal
                             )
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -269,7 +299,7 @@ fun ScanMealScreen(
                                     .fillMaxWidth()
                                     .height(configuration.screenHeightDp.dp * 0.4f)
                                     .padding(horizontal = 24.dp)
-                                    .align(Alignment.Center)
+                                    .align(Alignment.Center), isAnalyzingMeal = true
                             )
                         }
                     }

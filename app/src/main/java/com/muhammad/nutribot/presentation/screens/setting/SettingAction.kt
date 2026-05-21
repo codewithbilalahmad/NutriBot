@@ -9,4 +9,5 @@ sealed interface SettingAction{
     data object OnToggleActivityLevelSection : SettingAction
     data class OnToggleReminderEnabled(val enable : Boolean) : SettingAction
     data class OnChangeProfile(val profile: UserProfile) : SettingAction
+    data object OnToggleNotificationPermissionDeniedDialog : SettingAction
 }

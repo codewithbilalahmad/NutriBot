@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.navigation
 
+import com.muhammad.nutribot.domain.model.Food
 import kotlinx.serialization.Serializable
 
 sealed interface Destination {
@@ -13,6 +14,8 @@ sealed interface Destination {
     data object DiaryScreen : Destination
     @Serializable
     data object ScanMealScreen : Destination
+    @Serializable
+    data class MealDetailScreen(val food: Food) : Destination
     @Serializable
     data object ProgressScreen : Destination
     @Serializable

@@ -7,6 +7,12 @@ object Constants {
     const val NUTRITION_CALCULATION_PREF_KEY = "nutrition_calculation"
     const val IS_USER_LOGGED_IN_PREF_KEY = "is_user_logged_in"
     const val IS_REMINDER_ENABLE_PREF_KEY = "is_reminder_enable"
-    const val GEMINI_API_KEY = "AIzaSyDHJejMkawpUvhjU7loPh799y7RglDDTO4"
+    const val MEAL_TYPE = "meal_type"
+    const val MEAL_REMINDER_NAME = "Meal Reminder"
+    const val BREAKFAST_REMINDER = "breakfast_reminder"
+    const val LUNCH_REMINDER = "launch_reminder"
+    const val DINNER_REMINDER = "dinner_reminder"
+    const val MEAL_REMINDER_CHANNEL = "meal_reminder_channel"
+    const val GEMINI_API_KEY = "AIzaSyDo0d2pOtkt-iM_cM6gUXP6CQZ3oeLcYis"
     const val GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
 }

@@ -13,7 +13,7 @@ fun FoodWithWithIngredients.toFood(): Food {
         fat = food.fat,
         protein = food.protein,
         carbs = food.carbs,
-        eatenAt = Instant.fromEpochMilliseconds(food.eatenAt),
+        eatenAt = food.eatenAt,
         ingredients = ingredients.map { it.toIngredient() },
         numberOfServings = food.numberOfServings,
         confidenceScore = food.confidenceScore,
@@ -28,7 +28,7 @@ fun FoodEntity.toFood(): Food {
         fat = fat,
         protein = protein,
         carbs = carbs,
-        eatenAt = Instant.fromEpochMilliseconds(eatenAt),
+        eatenAt = eatenAt,
         ingredients = emptyList(),
         confidenceScore = confidenceScore,
         numberOfServings = numberOfServings
@@ -43,7 +43,7 @@ fun Food.toFoodEntity(): FoodEntity {
         fat = fat,
         protein = protein,
         carbs = carbs,
-        eatenAt = eatenAt.toEpochMilliseconds(),
+        eatenAt = eatenAt,
         numberOfServings = numberOfServings,
         confidenceScore = confidenceScore,
     )

@@ -34,7 +34,12 @@ class SettingViewModel(
             SettingAction.OnToggleHeightAndWeightSection -> onToggleHeightAndWeightSection()
             is SettingAction.OnToggleReminderEnabled -> onToggleReminderEnabled(action.enable)
             is SettingAction.OnChangeProfile -> onChangeProfile(action.profile)
+            SettingAction.OnToggleNotificationPermissionDeniedDialog -> onToggleNotificationPermissionDeniedDialog()
         }
+    }
+
+    private fun onToggleNotificationPermissionDeniedDialog() {
+        _state.update { it.copy(showNotificationPermissionDeniedDialog = !it.showNotificationPermissionDeniedDialog) }
     }
 
     private fun onChangeProfile(profile: UserProfile) {
