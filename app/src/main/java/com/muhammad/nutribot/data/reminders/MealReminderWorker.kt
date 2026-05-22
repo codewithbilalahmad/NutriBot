@@ -81,13 +81,19 @@ class MealReminderWorker(
                 "Don’t forget to track your meal 🍽️"
             )
         }
+        val meal = when(mealType){
+            BREAKFAST_REMINDER -> context.getString(R.string.breakfast)
+            LUNCH_REMINDER -> context.getString(R.string.launch)
+            DINNER_REMINDER -> context.getString(R.string.dinner)
+            else -> context.getString(R.string.meal)
+        }
         val activityIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
         }
         val activityPendingIntent = PendingIntent.getActivity( context, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val notification = NotificationCompat.Builder(context, MEAL_REMINDER_CHANNEL)
             .setSmallIcon(R.drawable.ic_meal).setContentTitle(
-                "$mealType Reminder"
+                "$meal Reminder"
             ).setContentText(contentTexts.random()).setContentIntent(activityPendingIntent).setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true).build()
         NotificationManagerCompat.from(context).notify(mealType.hashCode(), notification)

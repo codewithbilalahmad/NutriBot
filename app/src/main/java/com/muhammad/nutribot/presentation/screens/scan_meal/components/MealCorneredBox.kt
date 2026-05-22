@@ -66,9 +66,11 @@ fun MealCorneredBox(
                 drawContent()
 
                 if (isAnalyzingMeal) {
-
+                    val stroke = strokeWidth.toPx()
+                    val scannerWidth = size.width - (stroke * 2)
                     val scannerHeight = size.height * 0.4f
-                    val y = (size.height - scannerHeight - strokeWidth.toPx() * 2) * animatedProgress
+                    val x = stroke
+                    val y = (size.height - scannerHeight - stroke * 2) * animatedProgress
                     drawRoundRect(
                         brush = Brush.verticalGradient(
                             colors = listOf(
@@ -78,12 +80,12 @@ fun MealCorneredBox(
                                 scannerColor.copy(alpha = 0.4f),
                                 scannerColor.copy(alpha = 0.5f),
                             ),
-                            startY = 0f,
-                            endY = y
+                            startY = y,
+                            endY = y + scannerHeight
                         ),
-                        topLeft = Offset(0f, y),
+                        topLeft = Offset(x, y),
                         size = Size(
-                            width = size.width - strokeWidth.toPx() * 2f,
+                            width = scannerWidth,
                             height = scannerHeight
                         ), cornerRadius = CornerRadius(100f, 100f)
                     )

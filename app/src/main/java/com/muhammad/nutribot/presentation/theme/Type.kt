@@ -62,7 +62,7 @@ val Typography = Typography(
     ),
     titleSmall = TextStyle(
         fontSize = 18.sp,
-        lineHeight = 18.sp,
+        lineHeight = 20.sp,
         fontFamily = lato,
         fontWeight = FontWeight.Medium,
     ),

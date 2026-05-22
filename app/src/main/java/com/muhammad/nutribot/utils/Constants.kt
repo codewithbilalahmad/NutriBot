@@ -13,6 +13,6 @@ object Constants {
     const val LUNCH_REMINDER = "launch_reminder"
     const val DINNER_REMINDER = "dinner_reminder"
     const val MEAL_REMINDER_CHANNEL = "meal_reminder_channel"
-    const val GEMINI_API_KEY = "AIzaSyDqscpZHhhQV-E5bthqPWtGxkul7NMLH54"
+    const val GEMINI_API_KEY = "AIzaSyA6GTXh-9xgRpnzzXxQpTL0wFbyCicIeDQ"
     const val GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
 }

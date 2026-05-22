@@ -20,16 +20,7 @@ import kotlin.reflect.typeOf
 fun AppNavigation(
     navController: NavHostController, isUserLoggedIn: Boolean, isInternetConnected: Boolean,
 ) {
-    val startDestination = if (isUserLoggedIn) Destination.MealDetailScreen(food = Food(id=6623597361860987959, name= "Beef Curry", mealImageUrl="/data/user/0/com.muhammad.nutribot/cache/meal_1779284163736.png", calories=450, protein=35, fat=25, carbs=15, numberOfServings=1, eatenAt=1779284163863, confidenceScore=90, ingredients=listOf(Ingredient(id=894940839906068697, foodId=6623597361860987959, name="Beef", calories=300, protein=30, fat=20, carbs=0, isSelected=true), Ingredient(id=5888185990940345621, foodId=6623597361860987959, name="Curry Sauce", calories=100, protein=3, fat=4, carbs=12, isSelected=true), Ingredient(
-        id = 2633154388371787560,
-        foodId = 6623597361860987959,
-        name = "Cilantro",
-        calories = 5,
-        protein = 1,
-        fat = 0,
-        carbs = 3,
-        isSelected = true
-    )), isFavorite=false)) else Destination.WelcomeScreen
+    val startDestination = if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
     SharedTransitionLayout {
         NavHost(navController = navController, startDestination = startDestination) {
             composable<Destination.WelcomeScreen> {

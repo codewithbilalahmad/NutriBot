@@ -13,7 +13,11 @@ class MealDetectionAnalyzer(
     private val onMealDetected: (Boolean) -> Unit,
 ) : ImageAnalysis.Analyzer {
 
+    @Volatile
+    var isPaused = false
+
     private val labeler by lazy {
+
         val options = ImageLabelerOptions.Builder()
             .setConfidenceThreshold(0.6f)
             .build()
@@ -24,8 +28,26 @@ class MealDetectionAnalyzer(
     private var lastResult = false
     private var isProcessing = false
 
+    private var lastAnalyzedTime = 0L
+
     @OptIn(ExperimentalGetImage::class)
-    override fun analyze(imageProxy: ImageProxy) {
+    override fun analyze(
+        imageProxy: ImageProxy
+    ) {
+
+        if (isPaused) {
+            imageProxy.close()
+            return
+        }
+
+        val currentTime = System.currentTimeMillis()
+
+        if (currentTime - lastAnalyzedTime < 800) {
+            imageProxy.close()
+            return
+        }
+
+        lastAnalyzedTime = currentTime
 
         if (isProcessing) {
             imageProxy.close()
@@ -47,9 +69,11 @@ class MealDetectionAnalyzer(
         )
 
         labeler.process(image)
+
             .addOnSuccessListener { labels ->
 
                 val isMeal = labels.any { label ->
+
                     val text = label.text.lowercase()
 
                     MEAL_LABELS.any { keyword ->
@@ -58,15 +82,21 @@ class MealDetectionAnalyzer(
                 }
 
                 if (isMeal != lastResult) {
+
                     lastResult = isMeal
+
                     onMealDetected(isMeal)
                 }
             }
+
             .addOnFailureListener {
                 it.printStackTrace()
             }
+
             .addOnCompleteListener {
+
                 isProcessing = false
+
                 imageProxy.close()
             }
     }

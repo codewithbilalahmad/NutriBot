@@ -8,9 +8,8 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -105,7 +104,7 @@ fun ScanMealScreen(
     val photoPickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
-                viewModel.onAction(ScanMealAction.OnPickMealGalleryImage(uri.toString()))
+                viewModel.onAction(ScanMealAction.OnPickMealGalleryImage(uri = uri.toString(), lifecycleOwner = lifeCycleOwner))
             }
         }
     val cameraPermissionLauncher =
@@ -208,7 +207,7 @@ fun ScanMealScreen(
                         enabled = cameraPermissionGranted,
                         onCaptureMealPhoto = {
                             if (isInternetConnected) {
-                                viewModel.onAction(ScanMealAction.OnCaptureMealPhoto)
+                                viewModel.onAction(ScanMealAction.OnCaptureMealPhoto(lifecycleOwner = lifeCycleOwner))
                             } else {
                                 viewModel.onAction(ScanMealAction.OnNotifyNoInternetConnection)
                             }
@@ -248,10 +247,7 @@ fun ScanMealScreen(
                                             sharedContentState = rememberSharedContentState(key = "meal_image"),
                                             animatedVisibilityScope = animatedVisibilityScope,
                                             boundsTransform = { _, _ ->
-                                                spring(
-                                                    dampingRatio = DampingRatioMediumBouncy,
-                                                    stiffness = Spring.StiffnessMedium
-                                                )
+                                                tween(durationMillis = 300, easing = FastOutLinearInEasing)
                                             }
                                         ),
                                     contentScale = ContentScale.Crop
@@ -307,7 +303,7 @@ fun ScanMealScreen(
                                     .fillMaxWidth()
                                     .height(configuration.screenHeightDp.dp * 0.4f)
                                     .padding(horizontal = 24.dp)
-                                    .align(Alignment.Center), isAnalyzingMeal = false
+                                    .align(Alignment.Center), isAnalyzingMeal = true
                             )
                         }
                     }

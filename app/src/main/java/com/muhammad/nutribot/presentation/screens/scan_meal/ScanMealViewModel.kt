@@ -21,6 +21,7 @@ import com.muhammad.nutribot.utils.decodeBitmap
 import com.muhammad.nutribot.utils.detectImageContainsMeal
 import com.muhammad.nutribot.utils.resizeBitmap
 import com.muhammad.nutribot.utils.saveBitmapToFile
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -28,7 +29,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 class ScanMealViewModel(
@@ -60,9 +63,9 @@ class ScanMealViewModel(
 
     fun onAction(action: ScanMealAction) {
         when (action) {
-            ScanMealAction.OnCaptureMealPhoto -> onCaptureMealPhoto()
+           is ScanMealAction.OnCaptureMealPhoto -> onCaptureMealPhoto(action.lifecycleOwner)
             ScanMealAction.OnNotifyNoInternetConnection -> onNotifyNoInternetConnection()
-            is ScanMealAction.OnPickMealGalleryImage -> onPickMealGalleryImage(action.uri)
+            is ScanMealAction.OnPickMealGalleryImage -> onPickMealGalleryImage(uri = action.uri, lifecycleOwner = action.lifecycleOwner)
             is ScanMealAction.OnStartCamera -> onStartCamera(action.lifecycleOwner)
             ScanMealAction.OnToggleFlash -> onToggleFlash()
             ScanMealAction.OnToggleCameraPermissionPermanentlyDeniedDialog -> onToggleCameraPermissionPermanentlyDeniedDialog()
@@ -96,11 +99,11 @@ class ScanMealViewModel(
         )
     }
 
-    private fun onPickMealGalleryImage(uri: String) {
+    private fun onPickMealGalleryImage(uri: String,lifecycleOwner: LifecycleOwner) {
         val bitmap = decodeBitmap(uri) ?: return
         detectImageContainsMeal(bitmap = bitmap, onResult = { isMealPhoto ->
             if (isMealPhoto) {
-                analyzeMeal(bitmap)
+                analyzeMeal(bitmap = bitmap, lifecycleOwner = lifecycleOwner)
             } else {
                 _snackbarEvents.trySend(
                     SnackbarEvent.ShowSnackbar(
@@ -112,9 +115,9 @@ class ScanMealViewModel(
         })
     }
 
-    private fun onCaptureMealPhoto() {
+    private fun onCaptureMealPhoto(lifecycleOwner: LifecycleOwner) {
         cameraController.capturePhoto { bitmap ->
-            analyzeMeal(bitmap)
+            analyzeMeal(bitmap= bitmap, lifecycleOwner = lifecycleOwner)
         }
     }
 
@@ -132,9 +135,10 @@ class ScanMealViewModel(
         cameraController.toggleFlash()
     }
 
-    private fun analyzeMeal(bitmap: Bitmap) {
+    private fun analyzeMeal(bitmap: Bitmap,lifecycleOwner: LifecycleOwner) {
         viewModelScope.launch {
             try {
+                cameraController.stopCamera()
                 _state.update {
                     it.copy(
                         mealBitmap = bitmap,
@@ -142,31 +146,19 @@ class ScanMealViewModel(
                         analyzingMealStepIndex = 0
                     )
                 }
-                cameraController.stopCamera()
                 analyzingStepJob?.cancel()
-
                 analyzingStepJob = viewModelScope.launch {
+                    val steps = state.value.analyzingMealSteps
 
-                    while (true) {
-
+                    for (i in steps.indices) {
+                        if (!isActive) break
+                        _state.update { it.copy(analyzingMealStepIndex = i) }
                         delay(2000)
-
-                        _state.update { current ->
-
-                            val nextIndex =
-                                if (current.analyzingMealStepIndex >= current.analyzingMealSteps.lastIndex) {
-                                    0
-                                } else {
-                                    current.analyzingMealStepIndex + 1
-                                }
-
-                            current.copy(
-                                analyzingMealStepIndex = nextIndex
-                            )
-                        }
                     }
                 }
-                val resizedBitmap = resizeBitmap(bitmap)
+                val resizedBitmap = withContext(Dispatchers.Default) {
+                    resizeBitmap(bitmap)
+                }
                 val prompt = """
 Analyze this food image for a nutrition tracking app.
 
@@ -194,10 +186,38 @@ FORMAT:
 }
 
 RULES:
-- confidenceScore MUST be INTEGER between 0 and 100 (example: 85, NOT 0.85)
-- Never use decimals for confidenceScore
-- Only visible food items
-- Split mixed meals into ingredients
+
+GENERAL:
+- confidenceScore MUST be INTEGER between 0 and 100
+- No decimals allowed anywhere for confidenceScore
+- Only analyze visible ready-to-eat food items
+- Ignore cooking components completely
+
+NAME RULE (IMPORTANT):
+- "name" MUST include the MAIN DISH + visible components separated by commas
+- Example:
+  - "Chicken Burger, Fries"
+  - "Chicken Biryani, Salad"
+  - "Rice, Chicken Curry"
+  - "Apple"
+- Do NOT include cooking ingredients (oil, salt, spices, etc.)
+
+INGREDIENT RULES (VERY IMPORTANT):
+- ONLY include "ingredients" when there are MULTIPLE DISTINCT FOOD DISHES
+- Ingredients are ONLY for separate meal items, NOT cooking components
+
+VALID EXAMPLES:
+✔ Burger + Fries → ingredients = [Burger, Fries]
+✔ Rice + Chicken Curry → ingredients = [Rice, Chicken Curry]
+
+INVALID (NEVER DO THIS):
+❌ oil, salt, garlic, spices, butter
+
+SINGLE FOOD RULE:
+- If only one dish exists:
+  → ingredients MUST be []
+
+OUTPUT RULES:
 - No extra fields
 - No markdown
 - No explanation
@@ -207,7 +227,9 @@ RULES:
                     image(resizedBitmap)
                     text(prompt)
                 }
-                val response = generativeModel.generateContent(inputContent)
+                val response = withContext(Dispatchers.IO){
+                    generativeModel.generateContent(inputContent)
+                }
                 val rawText = response.text ?: ""
                 val cleaned = cleanJson(rawText)
                 val meal = parseScannedMeal(cleaned)
@@ -225,6 +247,18 @@ RULES:
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                cameraController.startCamera(lifecycleOwner = lifecycleOwner, onCameraBinding = {
+                    _state.update { it.copy(isCameraLoading = true) }
+                },
+                    onCameraBindSuccess = {
+                        _state.update { it.copy(isCameraLoading = false) }
+                    },
+                    onMealDetected = { mealDetected ->
+
+                        _state.update {
+                            it.copy(mealDetected = mealDetected)
+                        }
+                    })
                 _snackbarEvents.trySend(
                     SnackbarEvent.ShowSnackbar(
                         message = context.getString(R.string.error_analyzing_meal),

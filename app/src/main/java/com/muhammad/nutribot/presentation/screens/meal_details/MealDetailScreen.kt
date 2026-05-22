@@ -2,9 +2,9 @@ package com.muhammad.nutribot.presentation.screens.meal_details
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.Spring.DampingRatioMediumBouncy
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,7 +70,11 @@ fun MealDetailScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     food: Food,
 ) {
-    val density= LocalDensity.current
+    val density = LocalDensity.current
+    val gradientHeight = 100.dp
+    val gradientHeightPx = with(density) {
+        gradientHeight.toPx()
+    }
     val layoutDirection = LocalLayoutDirection.current
     val listState = rememberLazyListState()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -117,8 +123,8 @@ fun MealDetailScreen(
                     AppImage(
                         image = food.mealImageUrl,
                         modifier = Modifier
-                            .graphicsLayer{
-                                translationY = with(density){
+                            .graphicsLayer {
+                                translationY = with(density) {
                                     -scrollOffset.toFloat() * 0.5f
                                 }
                             }
@@ -129,10 +135,7 @@ fun MealDetailScreen(
                                 ),
                                 animatedVisibilityScope = animatedVisibilityScope,
                                 boundsTransform = { _, _ ->
-                                    spring(
-                                        dampingRatio = DampingRatioMediumBouncy,
-                                        stiffness = Spring.StiffnessMedium
-                                    )
+                                    tween(durationMillis = 300, easing = FastOutLinearInEasing)
                                 }
                             )
                     )
@@ -245,18 +248,42 @@ fun MealDetailScreen(
                         Spacer(Modifier.height(16.dp))
                         Text(
                             text = stringResource(R.string.ingredients_found),
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
                         Spacer(Modifier.height(12.dp))
-                        food.ingredients.forEach { ingredient ->
-                            MealIngredientCard(
-                                ingredient = ingredient,
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                                onClick = {
+                        if (food.ingredients.isNotEmpty()) {
+                            food.ingredients.forEach { ingredient ->
+                                MealIngredientCard(
+                                    ingredient = ingredient,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    onClick = {
 
-                                })
-                            Spacer(Modifier.height(8.dp))
+                                    })
+                                Spacer(Modifier.height(8.dp))
+                            }
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ingredients),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(150.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.no_ingredients_found),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
                         }
                     }
                 }
@@ -264,19 +291,22 @@ fun MealDetailScreen(
 
             Box(
                 modifier = Modifier
-                    .graphicsLayer{
-                        translationY = -scrollOffset * 0.5f
+                    .graphicsLayer {
+                        translationY = (-gradientHeightPx + (scrollOffset * 0.5f)).coerceIn(
+                            -gradientHeightPx,
+                            0f
+                        )
                     }
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
-                    .height(100.dp)
+                    .height(gradientHeight)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
+                                MaterialTheme.colorScheme.background.copy(0.8f),
                                 MaterialTheme.colorScheme.background.copy(0.7f),
                                 MaterialTheme.colorScheme.background.copy(0.6f),
                                 MaterialTheme.colorScheme.background.copy(0.5f),
-                                MaterialTheme.colorScheme.background.copy(0.4f),
                                 Color.Transparent
                             )
                         )

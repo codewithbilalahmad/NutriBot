@@ -7,7 +7,6 @@ import com.muhammad.nutribot.domain.repository.reminder.MealReminderScheduler
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent

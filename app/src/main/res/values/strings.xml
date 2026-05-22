@@ -108,4 +108,5 @@
     <string name="discard">Discard</string>
     <string name="log_to">Log to</string>
     <string name="ingredients_found">Ingredients found</string>
+    <string name="no_ingredients_found">No Ingredients found</string>
 </resources>
