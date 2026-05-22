@@ -8,6 +8,7 @@ import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -18,12 +19,11 @@ class BootReceiver : BroadcastReceiver(), KoinComponent{
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
             CoroutineScope(Dispatchers.IO).launch{
-                settingRepository.observeEnableReminder().collectLatest { enabled ->
-                    if (enabled) {
-                        reminderScheduler.scheduleReminders()
-                    } else {
-                        reminderScheduler.cancelReminders()
-                    }
+                val enabled = settingRepository.observeEnableReminder().first()
+                if (enabled) {
+                    reminderScheduler.scheduleReminders()
+                } else {
+                    reminderScheduler.cancelReminders()
                 }
             }
         }

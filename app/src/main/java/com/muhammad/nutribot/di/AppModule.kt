@@ -20,6 +20,7 @@ import com.muhammad.nutribot.domain.repository.reminder.MealReminderScheduler
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import com.muhammad.nutribot.main.MainViewModel
 import com.muhammad.nutribot.presentation.screens.diary.DiaryViewModel
+import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailViewModel
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupViewModel
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealViewModel
 import com.muhammad.nutribot.presentation.screens.setting.SettingViewModel
@@ -54,4 +55,5 @@ val appModule = module {
     viewModelOf(::DiaryViewModel)
     viewModelOf(::SettingViewModel)
     viewModelOf(::ScanMealViewModel)
+    viewModelOf(::MealDetailViewModel)
 }

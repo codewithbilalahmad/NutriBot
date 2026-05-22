@@ -23,7 +23,7 @@ fun MealNutritionSection(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         MealNutritionCard(
             icon = R.drawable.ic_protein,

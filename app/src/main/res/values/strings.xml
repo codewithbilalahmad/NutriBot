@@ -106,4 +106,6 @@
     <string name="allow_reminders_desp">Enable daily calorie reminders for breakfast, lunch, and dinner to help you stay consistent with your nutrition goals.</string>
     <string name="confirm">Confirm</string>
     <string name="discard">Discard</string>
+    <string name="log_to">Log to</string>
+    <string name="ingredients_found">Ingredients found</string>
 </resources>

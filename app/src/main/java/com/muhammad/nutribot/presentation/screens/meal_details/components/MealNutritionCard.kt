@@ -54,7 +54,7 @@ fun MealNutritionCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ){
                 Icon(
                     imageVector = ImageVector.vectorResource(icon),
