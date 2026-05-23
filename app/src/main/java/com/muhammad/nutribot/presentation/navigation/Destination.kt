@@ -19,5 +19,9 @@ sealed interface Destination {
     @Serializable
     data object ProgressScreen : Destination
     @Serializable
+    data object StreakScreen : Destination
+    @Serializable
+    data object StreakProgressScreen : Destination
+    @Serializable
     data object SettingScreen : Destination
 }

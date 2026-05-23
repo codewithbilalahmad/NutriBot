@@ -25,12 +25,16 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -52,23 +56,29 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.muhammad.nutribot.R
-import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.presentation.components.button.PrimaryButton
+import com.muhammad.nutribot.presentation.components.button.SecondaryButton
 import com.muhammad.nutribot.presentation.components.image.AppImage
+import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealDateCard
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealIngredientCard
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealNutritionSection
 import com.muhammad.nutribot.presentation.screens.meal_details.components.NumberOfServingsSection
 import com.muhammad.nutribot.presentation.screens.meal_details.components.TotalCaloriesCard
+import com.muhammad.nutribot.utils.ObserveAsEvents
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Composable
 fun MealDetailScreen(
     navHostController: NavHostController,
     viewModel: MealDetailViewModel = koinViewModel(),
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope,
-    food: Food,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val density = LocalDensity.current
     val gradientHeight = 100.dp
@@ -78,9 +88,26 @@ fun MealDetailScreen(
     val layoutDirection = LocalLayoutDirection.current
     val listState = rememberLazyListState()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val food = state.food
+    val datePickerState = rememberDatePickerState(initialSelectedDate = state.selectedDate.toJavaLocalDate(), selectableDates = object : SelectableDates{
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+            val today = Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+            val date = Instant.fromEpochMilliseconds(utcTimeMillis).toLocalDateTime(TimeZone.currentSystemDefault()).date
+            return date <= today
+        }
+    })
     val scrollOffset by remember {
         derivedStateOf {
             listState.firstVisibleItemScrollOffset
+        }
+    }
+    ObserveAsEvents(viewModel.events) {event ->
+        when(event){
+            MealDetailEvent.OnMealLoggedSuccess -> {
+                navHostController.navigate(Destination.StreakProgressScreen)
+            }
         }
     }
     Scaffold(
@@ -96,12 +123,14 @@ fun MealDetailScreen(
                         state.selectedDate.month.name.lowercase()
                             .replaceFirstChar { it.uppercase() }
                     }",
-                    onClick = {},
+                    onClick = {
+                        viewModel.onAction(MealDetailAction.OnLogToMeal)
+                    },
                     contentPadding = PaddingValues(vertical = 16.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-        }, containerColor = MaterialTheme.colorScheme.background
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -158,12 +187,13 @@ fun MealDetailScreen(
                     ) {
 
                         IconButton(
-                            onClick = {},
+                            onClick = {
+                                viewModel.onAction(MealDetailAction.OnToggleMealFavourite)
+                            },
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.Black.copy(alpha = 0.3f)
                             )
                         ) {
-
                             val icon =
                                 if (food.isFavorite)
                                     R.drawable.ic_favourite_filled
@@ -205,7 +235,7 @@ fun MealDetailScreen(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(16.dp))
                                 .padding(horizontal = 4.dp)
                                 .clickable {}
                                 .padding(
@@ -221,8 +251,12 @@ fun MealDetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                             food = food,
-                            onAddServings = {},
-                            onMinusServings = {}
+                            onAddServings = {
+                                viewModel.onAction(MealDetailAction.OnChangeMealNumberOfServings((food.numberOfServings + 1).coerceAtMost(10)))
+                            },
+                            onMinusServings = {
+                                viewModel.onAction(MealDetailAction.OnChangeMealNumberOfServings((food.numberOfServings - 1).coerceAtLeast(1)))
+                            }
                         )
 
                         Spacer(Modifier.height(16.dp))
@@ -253,7 +287,7 @@ fun MealDetailScreen(
                                 .padding(horizontal = 16.dp),
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                         )
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(16.dp))
                         if (food.ingredients.isNotEmpty()) {
                             food.ingredients.forEach { ingredient ->
                                 MealIngredientCard(
@@ -262,7 +296,7 @@ fun MealDetailScreen(
                                         .fillMaxWidth()
                                         .padding(horizontal = 16.dp),
                                     onClick = {
-
+                                        viewModel.onAction(MealDetailAction.OnToggleIngredientSelection(id = ingredient.id))
                                     })
                                 Spacer(Modifier.height(8.dp))
                             }
@@ -338,8 +372,31 @@ fun MealDetailScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 8.dp),
-                selectedDate = state.selectedDate, onClick = {}
+                selectedDate = state.selectedDate, onClick = {
+                    viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog)
+                }
             )
         }
+    }
+    if (state.showDatePickerDialog) {
+        DatePickerDialog(
+            onDismissRequest = { viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog) },
+            dismissButton = {
+                SecondaryButton(text = stringResource(R.string.cancel), onClick = {
+                    viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog)
+                })
+            }, confirmButton = {
+                PrimaryButton(text = stringResource(R.string.done), onClick = {
+                    viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog)
+                    val selectedDateMillis = datePickerState.selectedDateMillis
+                    if(selectedDateMillis != null){
+                        val selectedDate = Instant.fromEpochMilliseconds(selectedDateMillis).toLocalDateTime(
+                            TimeZone.currentSystemDefault()).date
+                        viewModel.onAction(MealDetailAction.OnChangeSelectedDate(date = selectedDate))
+                    }
+                })
+            }, content = {
+                DatePicker(state= datePickerState)
+            })
     }
 }

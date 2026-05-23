@@ -31,11 +31,11 @@ import kotlin.time.Clock
 fun MealDateCard(modifier: Modifier = Modifier, selectedDate: LocalDate, onClick: () -> Unit) {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     val dateLabel = when (selectedDate) {
-        today -> "${stringResource(R.string.today)} ${selectedDate.day} ${
+        today -> "${stringResource(R.string.today)}, ${selectedDate.day} ${
             selectedDate.month.name.lowercase().replaceFirstChar { it.uppercase() }
         }"
         today.minus(DatePeriod(days = 1)) -> {
-            "${stringResource(R.string.yesterday)} ${selectedDate.day} ${
+            "${stringResource(R.string.yesterday)}, ${selectedDate.day} ${
                 selectedDate.month.name.lowercase().replaceFirstChar { it.uppercase() }
             }"
         }

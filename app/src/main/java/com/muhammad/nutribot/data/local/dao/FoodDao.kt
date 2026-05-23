@@ -44,6 +44,11 @@ interface FoodDao{
         "SELECT * FROM FoodEntity WHERE id =:id ORDER BY eatenAt DESC"
     )
     fun getFoodById(id: Long): Flow<FoodWithWithIngredients?>
+
+    @Query(
+        "UPDATE FoodEntity SET isFavourite = :isFavourite WHERE id = :id"
+    )
+    fun updateFoodFavourite(id: Long, isFavourite: Boolean)
 }
 
 fun FoodDao.getFoodStreak(): Flow<Int> {

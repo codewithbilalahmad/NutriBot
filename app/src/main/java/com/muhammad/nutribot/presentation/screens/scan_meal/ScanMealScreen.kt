@@ -107,8 +107,7 @@ fun ScanMealScreen(
                 viewModel.onAction(ScanMealAction.OnPickMealGalleryImage(uri = uri.toString(), lifecycleOwner = lifeCycleOwner))
             }
         }
-    val cameraPermissionLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             cameraPermissionGranted = isGranted
             val cameraPermanentlyDenied =
                 !isGranted && !ActivityCompat.shouldShowRequestPermissionRationale(

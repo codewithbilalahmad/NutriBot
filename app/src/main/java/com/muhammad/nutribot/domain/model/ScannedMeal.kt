@@ -29,7 +29,7 @@ fun ScannedMeal.toFood(mealImageUrl: String): Food {
         carbs = carbs,
         numberOfServings = 1,
         isFavorite = false,
-        eatenAt = System.currentTimeMillis(),
+        eatenAt = 0L,
         confidenceScore = confidenceScore,
         ingredients = ingredients.map {
             Ingredient(

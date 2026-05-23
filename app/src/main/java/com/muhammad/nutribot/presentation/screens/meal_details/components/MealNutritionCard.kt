@@ -1,6 +1,7 @@
 package com.muhammad.nutribot.presentation.screens.meal_details.components
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,6 +71,7 @@ fun MealNutritionCard(
             ) {
                 Text(
                     text = "$value ${stringResource(R.string.grams)}",
+                    modifier = Modifier.animateContentSize(animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Icon(

@@ -14,5 +14,6 @@ data class FoodEntity(
     val carbs : Int,
     val numberOfServings : Int,
     val confidenceScore : Int,
-    val eatenAt : Long = System.currentTimeMillis()
+    val eatenAt : Long = System.currentTimeMillis(),
+    val isFavourite : Boolean
 )

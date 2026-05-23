@@ -1,6 +1,7 @@
 package com.muhammad.nutribot.di
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.room.Room
 import com.muhammad.nutribot.NutriBotApplication
 import com.muhammad.nutribot.data.local.NutriBotDatabase
@@ -27,6 +28,7 @@ import com.muhammad.nutribot.presentation.screens.setting.SettingViewModel
 import com.muhammad.nutribot.utils.Constants.DATABASE_NAME
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -38,7 +40,7 @@ val appModule = module {
     singleOf(::CameraControllerImp).bind<CameraController>()
     single {
         Room.databaseBuilder<NutriBotDatabase>(get<Context>(), DATABASE_NAME)
-            .setQueryCoroutineContext(Dispatchers.IO).build()
+            .setQueryCoroutineContext(Dispatchers.IO).fallbackToDestructiveMigration(dropAllTables = true).build()
     }
     single {
         get<NutriBotDatabase>().foodDao()

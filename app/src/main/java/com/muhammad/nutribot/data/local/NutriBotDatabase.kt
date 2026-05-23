@@ -13,7 +13,7 @@ import com.muhammad.nutribot.data.local.entity.IngredientEntity
         IngredientEntity::class
     ],
     exportSchema = true,
-    version = 2
+    version = 3
 )
 abstract class NutriBotDatabase : RoomDatabase() {
     abstract fun foodDao(): FoodDao

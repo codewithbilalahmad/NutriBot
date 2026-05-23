@@ -1,11 +1,10 @@
 package com.muhammad.nutribot.presentation.navigation
 
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.domain.model.Ingredient
 import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
@@ -49,12 +48,16 @@ fun AppNavigation(
             composable<Destination.ProgressScreen> {
 
             }
+            composable<Destination.StreakScreen> {
+
+            }
+            composable<Destination.StreakProgressScreen> {
+
+            }
             composable<Destination.MealDetailScreen>(
                 typeMap = mapOf(typeOf<Food>() to CustomNavTypes.Food)
             ) {
-                val args = it.toRoute<Destination.MealDetailScreen>()
                 MealDetailScreen(
-                    food = args.food,
                     navHostController = navController,
                     animatedVisibilityScope = this,
                     sharedTransitionScope = this@SharedTransitionLayout

@@ -17,5 +17,5 @@ data class Food(
     val eatenAt : Long,
     val confidenceScore : Int,
     val ingredients: List<Ingredient>,
-    val isFavorite : Boolean = false
+    val isFavorite : Boolean
 )

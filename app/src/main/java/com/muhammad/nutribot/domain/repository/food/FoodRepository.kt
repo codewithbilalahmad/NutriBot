@@ -14,4 +14,5 @@ interface FoodRepository {
 
     fun getFoodStreak(): Flow<Int>
     fun getFoodById(id: Long): Flow<Food?>
+    fun updateFoodFavourite(id: Long, isFavourite: Boolean)
 }

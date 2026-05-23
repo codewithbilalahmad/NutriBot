@@ -1,5 +1,7 @@
 package com.muhammad.nutribot.presentation.screens.meal_details.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,6 +55,7 @@ fun TotalCaloriesCard(modifier: Modifier = Modifier, food: Food,onClick : () -> 
             ) {
                 Text(
                     text = "${food.calories} ${stringResource(R.string.kcal)}",
+                    modifier = Modifier.animateContentSize(animationSpec = MaterialTheme.motionScheme.fastEffectsSpec()),
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
                 )
                 Icon(

@@ -44,4 +44,8 @@ class FoodRepositoryImp(
     override fun getFoodById(id: Long): Flow<Food?> {
         return foodDao.getFoodById(id).map { it?.toFood() }
     }
+
+    override fun updateFoodFavourite(id: Long, isFavourite: Boolean) {
+        return foodDao.updateFoodFavourite(id = id, isFavourite = isFavourite)
+    }
 }

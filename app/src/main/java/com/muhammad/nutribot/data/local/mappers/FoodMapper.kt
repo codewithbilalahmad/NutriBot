@@ -3,7 +3,6 @@ package com.muhammad.nutribot.data.local.mappers
 import com.muhammad.nutribot.data.local.entity.FoodEntity
 import com.muhammad.nutribot.data.local.relations.FoodWithWithIngredients
 import com.muhammad.nutribot.domain.model.Food
-import kotlin.time.Instant
 
 fun FoodWithWithIngredients.toFood(): Food {
     return Food(
@@ -17,6 +16,7 @@ fun FoodWithWithIngredients.toFood(): Food {
         ingredients = ingredients.map { it.toIngredient() },
         numberOfServings = food.numberOfServings,
         confidenceScore = food.confidenceScore,
+        isFavorite = food.isFavourite
     )
 }
 
@@ -31,7 +31,8 @@ fun FoodEntity.toFood(): Food {
         eatenAt = eatenAt,
         ingredients = emptyList(),
         confidenceScore = confidenceScore,
-        numberOfServings = numberOfServings
+        numberOfServings = numberOfServings,
+        isFavorite = isFavourite
     )
 }
 
@@ -46,6 +47,7 @@ fun Food.toFoodEntity(): FoodEntity {
         eatenAt = eatenAt,
         numberOfServings = numberOfServings,
         confidenceScore = confidenceScore,
+        isFavourite = isFavorite
     )
 }
 
