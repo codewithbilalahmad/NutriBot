@@ -19,7 +19,8 @@ import kotlin.reflect.typeOf
 fun AppNavigation(
     navController: NavHostController, isUserLoggedIn: Boolean, isInternetConnected: Boolean,
 ) {
-    val startDestination = if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
+    val startDestination =
+        if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
     SharedTransitionLayout {
         NavHost(navController = navController, startDestination = startDestination) {
             composable<Destination.WelcomeScreen> {
@@ -32,7 +33,11 @@ fun AppNavigation(
 
             }
             composable<Destination.DiaryScreen> {
-                DiaryScreen(navHostController = navController)
+                DiaryScreen(
+                    navHostController = navController,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
             }
             composable<Destination.SettingScreen> {
                 SettingScreen(navHostController = navController)

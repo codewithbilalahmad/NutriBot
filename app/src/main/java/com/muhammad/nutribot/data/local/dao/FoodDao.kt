@@ -33,18 +33,19 @@ interface FoodDao{
     ): Flow<List<FoodEntity>>
     @Query(
         """
-            SELECT DISTINCT date(eatenAt / 100,'unixepoch')
+            SELECT DISTINCT date(eatenAt / 1000,'unixepoch')
             FROM FoodEntity
             ORDER BY eatenAt DESC
         """
     )
      fun getFoodDates() : Flow<List<String>>
+     @Query("SELECT * FROM FoodEntity ORDER BY eatenAt DESC")
+     fun getAllFoods() : Flow<List<FoodEntity>>
      @Transaction
     @Query(
         "SELECT * FROM FoodEntity WHERE id =:id ORDER BY eatenAt DESC"
     )
     fun getFoodById(id: Long): Flow<FoodWithWithIngredients?>
-
     @Query(
         "UPDATE FoodEntity SET isFavourite = :isFavourite WHERE id = :id"
     )
@@ -53,33 +54,30 @@ interface FoodDao{
 
 fun FoodDao.getFoodStreak(): Flow<Int> {
     return getFoodDates().map { dates ->
-
         if (dates.isEmpty()) return@map 0
 
         val localDates = dates
             .map { LocalDate.parse(it) }
             .sortedDescending()
 
-        val today = Clock.System.todayIn(
-            TimeZone.currentSystemDefault()
-        )
+        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+        val yesterday = today.minus(1, DateTimeUnit.DAY)
+
+        if (localDates.first() != today && localDates.first() != yesterday) {
+            return@map 0
+        }
 
         var streak = 0
-        var expectedDate = today
+        var expectedDate = localDates.first()
 
         for (date in localDates) {
-
             if (date == expectedDate) {
                 streak++
-                expectedDate = expectedDate.minus(
-                    1,
-                    DateTimeUnit.DAY
-                )
+                expectedDate = expectedDate.minus(1, DateTimeUnit.DAY)
             } else if (date < expectedDate) {
                 break
             }
         }
-
         streak
     }
 }

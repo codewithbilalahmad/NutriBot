@@ -9,10 +9,15 @@ import kotlin.time.Clock
 
 data class DiaryState(
     val foods: List<Food> = emptyList(),
-    val streak : Int= 0,
-    val nutritionCalculation: NutritionCalculation?=null,
-    val showAddFoodBottomSheet : Boolean = false,
-    val selectedDate : LocalDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val isLoadingFoods : Boolean = true,
+    val allFoods: List<Food> = emptyList(),
+    val streak: Int = 0,
+    val nutritionCalculation: NutritionCalculation? = null,
+    val showAddFoodBottomSheet: Boolean = false,
+    val selectedDate: LocalDate = Clock.System.now()
+        .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+    val selectedMeal: Food?=null,
+    val showDeleteMealDialog : Boolean = false
 ){
     val weekRange = -100..0
     val eatenCalories : Int = foods.sumOf { it.calories }

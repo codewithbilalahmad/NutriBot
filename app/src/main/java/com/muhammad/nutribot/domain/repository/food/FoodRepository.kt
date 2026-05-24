@@ -11,7 +11,7 @@ interface FoodRepository {
         startOfDay: Long,
         endOfDay: Long,
     ): Flow<List<Food>>
-
+    fun getAllFoods() : Flow<List<Food>>
     fun getFoodStreak(): Flow<Int>
     fun getFoodById(id: Long): Flow<Food?>
     fun updateFoodFavourite(id: Long, isFavourite: Boolean)

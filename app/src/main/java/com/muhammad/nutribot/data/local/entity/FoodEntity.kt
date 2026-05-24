@@ -9,6 +9,7 @@ data class FoodEntity(
     val id : Long = 0L,
     val name : String,
     val calories : Int,
+    val mealImageUrl : String,
     val protein : Int,
     val fat : Int,
     val carbs : Int,

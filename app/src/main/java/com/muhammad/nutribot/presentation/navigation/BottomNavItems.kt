@@ -12,8 +12,8 @@ enum class BottomNavItem(
 ) {
     Diary(
         route = Destination.DiaryScreen,
-        title = R.string.diary,
-        icon = R.drawable.ic_diary
+        title = R.string.meal,
+        icon = R.drawable.ic_meal
     ),
     Progress(
         route = Destination.ProgressScreen,

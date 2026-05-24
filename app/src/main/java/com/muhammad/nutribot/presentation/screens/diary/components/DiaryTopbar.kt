@@ -42,7 +42,7 @@ fun DiaryTopbar(
     onDateSelected: (LocalDate) -> Unit,
     onSettingClick: () -> Unit, weekRange: IntRange,
 ) {
-    Column(modifier = modifier.statusBarsPadding()) {
+    Column(modifier = modifier.background(MaterialTheme.colorScheme.background).statusBarsPadding().padding(bottom = 8.dp)) {
         WeekCalender(
             selectedDate = selectedDate,
             weekRange = weekRange,

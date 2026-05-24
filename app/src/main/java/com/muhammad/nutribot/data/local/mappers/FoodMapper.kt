@@ -29,6 +29,7 @@ fun FoodEntity.toFood(): Food {
         protein = protein,
         carbs = carbs,
         eatenAt = eatenAt,
+        mealImageUrl = mealImageUrl,
         ingredients = emptyList(),
         confidenceScore = confidenceScore,
         numberOfServings = numberOfServings,
@@ -40,6 +41,7 @@ fun Food.toFoodEntity(): FoodEntity {
     return FoodEntity(
         id = id,
         name = name,
+        mealImageUrl = mealImageUrl,
         calories = calories,
         fat = fat,
         protein = protein,

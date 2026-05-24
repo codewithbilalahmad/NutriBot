@@ -44,7 +44,7 @@ fun BottomNavigationBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(bottom = 8.dp)
+                .padding(vertical = 8.dp)
                 .background(MaterialTheme.colorScheme.background),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
@@ -53,7 +53,6 @@ fun BottomNavigationBar(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .navigationBarsPadding()
-                    .padding(bottom = 8.dp)
                     .background(MaterialTheme.colorScheme.background),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween

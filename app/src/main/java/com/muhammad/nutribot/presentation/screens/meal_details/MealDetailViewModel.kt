@@ -15,10 +15,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
-import kotlin.time.Instant
+import kotlin.time.Clock
 
 class MealDetailViewModel(
     saveStateHandle: SavedStateHandle,
@@ -42,7 +45,12 @@ class MealDetailViewModel(
 
     private fun onLogToMeal() {
         viewModelScope.launch(Dispatchers.IO) {
-            val eatenAt = state.value.selectedDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val selectedDateTime = LocalDateTime(
+                date = state.value.selectedDate,
+                time = now.time
+            )
+            val eatenAt = selectedDateTime.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
             foodRepository.upsertFood(food = state.value.food.copy(eatenAt = eatenAt))
             withContext(Dispatchers.Main){
                 _events.send(MealDetailEvent.OnMealLoggedSuccess)

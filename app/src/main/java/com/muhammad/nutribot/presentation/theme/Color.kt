@@ -25,4 +25,4 @@ val DarkErrorContainer = Color(0xFF93000A)
 
 val CarbsColor = Color(0xFFF31205)
 val ProteinColor = Color(0xFFFF9500)
-val FatColor = Color(0xFF007AFF)
+val FatColor = Color(0xFF4774A5)

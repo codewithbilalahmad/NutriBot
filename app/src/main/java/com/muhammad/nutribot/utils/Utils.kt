@@ -16,6 +16,7 @@ import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.muhammad.nutribot.NutriBotApplication
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
@@ -231,3 +232,5 @@ fun resizeBitmap(bitmap: Bitmap): Bitmap {
 }
 
 fun generateId(): Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
+
+fun LocalTime.toFormattedTime(): String = "%02d:%02d".format(hour, minute)

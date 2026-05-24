@@ -88,7 +88,7 @@ fun MealIngredientCard(modifier: Modifier = Modifier, ingredient: Ingredient, on
 }
 
 @Composable
-private fun IngredientItem(modifier: Modifier = Modifier, icon: Int, label: String, color: Color) {
+fun IngredientItem(modifier: Modifier = Modifier, icon: Int, label: String, color: Color) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -98,7 +98,7 @@ private fun IngredientItem(modifier: Modifier = Modifier, icon: Int, label: Stri
             imageVector = ImageVector.vectorResource(icon),
             contentDescription = null,
             tint = color,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(18.dp)
         )
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
     }
