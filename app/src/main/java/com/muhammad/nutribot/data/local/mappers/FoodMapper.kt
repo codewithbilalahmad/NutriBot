@@ -11,6 +11,7 @@ fun FoodWithWithIngredients.toFood(): Food {
         calories = food.calories,
         fat = food.fat,
         protein = food.protein,
+        mealImageUrl = food.mealImageUrl,
         carbs = food.carbs,
         eatenAt = food.eatenAt,
         ingredients = ingredients.map { it.toIngredient() },

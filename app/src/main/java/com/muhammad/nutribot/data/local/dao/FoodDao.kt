@@ -30,7 +30,7 @@ interface FoodDao{
     fun getFoodsByDate(
         startOfDay : Long,
        endOfDay : Long,
-    ): Flow<List<FoodEntity>>
+    ): Flow<List<FoodWithWithIngredients>>
     @Query(
         """
             SELECT DISTINCT date(eatenAt / 1000,'unixepoch')

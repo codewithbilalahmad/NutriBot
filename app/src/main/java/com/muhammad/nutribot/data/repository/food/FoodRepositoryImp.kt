@@ -25,7 +25,7 @@ class FoodRepositoryImp(
         endOfDay: Long,
     ): Flow<List<Food>> {
         return foodDao.getFoodsByDate(startOfDay, endOfDay).map { entities ->
-            entities.map { entity -> entity.toFood() }
+            entities.map { entity -> entity.toFood()}
         }
     }
 

@@ -44,6 +44,7 @@ class DiaryViewModel(
         foodsFlow,
         foodRepository.getAllFoods()
     ) { state, nutritionCalculation, streak, foods, allFoods ->
+        println("Meals : $foods")
         state.copy(
             foods = foods,
             isLoadingFoods = false,

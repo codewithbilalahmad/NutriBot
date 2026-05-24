@@ -2,7 +2,10 @@ package com.muhammad.nutribot.presentation.screens.meal_details
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,13 +39,15 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -61,12 +66,14 @@ import com.muhammad.nutribot.presentation.components.button.PrimaryButton
 import com.muhammad.nutribot.presentation.components.button.SecondaryButton
 import com.muhammad.nutribot.presentation.components.image.AppImage
 import com.muhammad.nutribot.presentation.navigation.Destination
+import com.muhammad.nutribot.presentation.screens.meal_details.components.HeartLikeAnimation
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealDateCard
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealIngredientCard
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealNutritionSection
 import com.muhammad.nutribot.presentation.screens.meal_details.components.NumberOfServingsSection
 import com.muhammad.nutribot.presentation.screens.meal_details.components.TotalCaloriesCard
 import com.muhammad.nutribot.utils.ObserveAsEvents
+import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
@@ -90,6 +97,24 @@ fun MealDetailScreen(
     val listState = rememberLazyListState()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val food = state.food
+    val heartScale = remember { Animatable(1f) }
+    var showLikeAnimation by remember { mutableStateOf(false) }
+    LaunchedEffect(food.isFavorite) {
+        if(food.isFavorite){
+            showLikeAnimation = true
+            heartScale.snapTo(0f)
+            launch {
+                heartScale.animateTo(
+                    targetValue = 1.4f,
+                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+                )
+                heartScale.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
+                )
+            }
+        }
+    }
     val datePickerState = rememberDatePickerState(initialSelectedDate = state.selectedDate.toJavaLocalDate(), selectableDates = object : SelectableDates{
         override fun isSelectableDate(utcTimeMillis: Long): Boolean {
             val today = Clock.System.now()
@@ -147,7 +172,7 @@ fun MealDetailScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp)
+                    .height(350.dp), contentAlignment = Alignment.Center
             ) {
                 with(sharedTransitionScope) {
                     AppImage(
@@ -159,18 +184,23 @@ fun MealDetailScreen(
                                 }
                             }
                             .fillMaxSize()
-                            .sharedBounds(
+                            .sharedElement(
                                 sharedContentState = rememberSharedContentState(
                                     key = "meal_image"
                                 ),
                                 animatedVisibilityScope = animatedVisibilityScope,
                                 boundsTransform = { _, _ ->
-                                    tween(durationMillis = 300, easing = FastOutLinearInEasing)
+                                    tween(durationMillis = 300, easing = LinearEasing)
                                 }
                             )
-                            .clipToBounds()
                     )
                 }
+                HeartLikeAnimation(
+                    showAnimation = showLikeAnimation,
+                    onAnimationFinished = {
+                        showLikeAnimation = false
+                    }
+                )
             }
 
             LazyColumn(
@@ -190,7 +220,7 @@ fun MealDetailScreen(
 
                         IconButton(
                             onClick = {
-                                viewModel.onAction(MealDetailAction.OnToggleMealFavourite)
+                                viewModel.onAction(MealDetailAction.OnToggleMealFavourite())
                             },
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.Black.copy(alpha = 0.3f)
@@ -211,6 +241,10 @@ fun MealDetailScreen(
                             Icon(
                                 imageVector = ImageVector.vectorResource(icon),
                                 contentDescription = null,
+                                modifier = Modifier.graphicsLayer{
+                                    scaleX = heartScale.value
+                                    scaleY = heartScale.value
+                                },
                                 tint = tint
                             )
                         }
@@ -220,6 +254,7 @@ fun MealDetailScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(top = 24.dp)
                             .clip(
                                 RoundedCornerShape(
                                     topStart = 16.dp,

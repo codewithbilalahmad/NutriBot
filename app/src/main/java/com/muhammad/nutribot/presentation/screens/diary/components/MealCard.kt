@@ -2,9 +2,8 @@ package com.muhammad.nutribot.presentation.screens.diary.components
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -88,16 +86,15 @@ fun MealCard(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .sharedBounds(
+                        .sharedElement(
                             sharedContentState = rememberSharedContentState(
                                 key = "meal_image"
                             ),
                             animatedVisibilityScope = animatedVisibilityScope,
                             boundsTransform = { _, _ ->
-                                tween(durationMillis = 300, easing = FastOutLinearInEasing)
+                                tween(durationMillis = 300, easing = LinearEasing)
                             }
                         )
-                        .clipToBounds()
                 )
             }
             Column(modifier = Modifier.weight(1f)) {

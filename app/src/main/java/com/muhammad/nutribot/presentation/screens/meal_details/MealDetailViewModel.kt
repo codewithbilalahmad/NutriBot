@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.domain.repository.food.FoodRepository
+import com.muhammad.nutribot.domain.repository.ingredient.IngredientRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
@@ -26,6 +26,7 @@ import kotlin.time.Clock
 class MealDetailViewModel(
     saveStateHandle: SavedStateHandle,
     private val foodRepository: FoodRepository,
+    private val ingredientRepository: IngredientRepository
 ) : ViewModel() {
     private val food = Json.decodeFromString<Food>(Uri.decode(checkNotNull(saveStateHandle["food"])))
     private val _state = MutableStateFlow(MealDetailState(food = food))
@@ -37,7 +38,7 @@ class MealDetailViewModel(
             is MealDetailAction.OnChangeSelectedDate -> onChangeSelectedDate(action.date)
             MealDetailAction.OnToggleDatePickerDialog -> onToggleDatePickerDialog()
             is MealDetailAction.OnToggleIngredientSelection -> onToggleIngredientSelection(action.id)
-            MealDetailAction.OnToggleMealFavourite -> onToggleMealFavourite()
+          is  MealDetailAction.OnToggleMealFavourite -> onToggleMealFavourite(action.favourite)
             is MealDetailAction.OnChangeMealNumberOfServings -> onChangeMealNumberOfServings(action.numberOfServings)
             MealDetailAction.OnLogToMeal -> onLogToMeal()
         }
@@ -45,13 +46,17 @@ class MealDetailViewModel(
 
     private fun onLogToMeal() {
         viewModelScope.launch(Dispatchers.IO) {
+            val food = state.value.food
             val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
             val selectedDateTime = LocalDateTime(
                 date = state.value.selectedDate,
                 time = now.time
             )
             val eatenAt = selectedDateTime.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-            foodRepository.upsertFood(food = state.value.food.copy(eatenAt = eatenAt))
+            foodRepository.upsertFood(food = food.copy(eatenAt = eatenAt))
+            food.ingredients.forEach { ingredient ->
+                ingredientRepository.upsertIngredient(ingredient = ingredient)
+            }
             withContext(Dispatchers.Main){
                 _events.send(MealDetailEvent.OnMealLoggedSuccess)
             }
@@ -72,9 +77,9 @@ class MealDetailViewModel(
         }
     }
 
-    private fun onToggleMealFavourite() {
+    private fun onToggleMealFavourite(favourite: Boolean?) {
         val food = _state.value.food
-        _state.update { it.copy(food = food.copy(isFavorite = !food.isFavorite)) }
+        _state.update { it.copy(food = food.copy(isFavorite = favourite?: !food.isFavorite)) }
         if (food.eatenAt != 0L) {
             viewModelScope.launch(Dispatchers.IO) {
                 foodRepository.updateFoodFavourite(id = food.id, isFavourite = food.isFavorite)

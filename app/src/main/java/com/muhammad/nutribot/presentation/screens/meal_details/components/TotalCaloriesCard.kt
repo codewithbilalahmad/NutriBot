@@ -1,6 +1,5 @@
 package com.muhammad.nutribot.presentation.screens.meal_details.components
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -32,8 +31,8 @@ fun TotalCaloriesCard(modifier: Modifier = Modifier, food: Food,onClick : () -> 
         modifier = modifier.dropShadow(
             shape = RoundedCornerShape(16.dp),
             shadow = Shadow(
-                radius = 4.dp,
-                spread = 4.dp,
+                radius = 2.dp,
+                spread = 2.dp,
                 color = MaterialTheme.colorScheme.surfaceContainerLow
             )
         ), onClick = onClick,
