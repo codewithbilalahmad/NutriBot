@@ -3,11 +3,13 @@ package com.muhammad.nutribot.data.repository.settings
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.muhammad.nutribot.domain.model.NutritionCalculation
 import com.muhammad.nutribot.domain.model.UserProfile
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
+import com.muhammad.nutribot.utils.Constants.BEST_STREAK_PREF_KEY
 import com.muhammad.nutribot.utils.Constants.DATA_STORE_FILE_NAME
 import com.muhammad.nutribot.utils.Constants.IS_REMINDER_ENABLE_PREF_KEY
 import com.muhammad.nutribot.utils.Constants.IS_USER_LOGGED_IN_PREF_KEY
@@ -28,6 +30,7 @@ class SettingRepositoryImp(
         private val NUTRITION_CALCULATION_KEY = stringPreferencesKey(NUTRITION_CALCULATION_PREF_KEY)
         private val IS_USER_LOGGED_IN_KEY = booleanPreferencesKey(IS_USER_LOGGED_IN_PREF_KEY)
         private val IS_REMINDER_ENABLE_KEY = booleanPreferencesKey(IS_REMINDER_ENABLE_PREF_KEY)
+        private val BEST_STREAK_KEY = intPreferencesKey(BEST_STREAK_PREF_KEY)
     }
     override suspend fun saveUserProfile(userProfile: UserProfile) {
         context.prefs.edit {prefs ->
@@ -55,6 +58,12 @@ class SettingRepositoryImp(
         }
     }
 
+    override suspend fun saveBestStreak(streak: Int) {
+        context.prefs.edit { prefs ->
+            prefs[BEST_STREAK_KEY] = streak
+        }
+    }
+
     override fun observeUserProfile(): Flow<UserProfile?> {
         return context.prefs.data.map { prefs ->
             val json = prefs[USER_PROFILE_KEY]
@@ -67,6 +76,12 @@ class SettingRepositoryImp(
                 }
             }
         }.distinctUntilChanged()
+    }
+
+    override fun observeBestStreak(): Flow<Int> {
+        return context.prefs.data.map { prefs ->
+            prefs[BEST_STREAK_KEY] ?: 0
+        }
     }
 
     override fun observeNutritionCalculation(): Flow<NutritionCalculation?> {

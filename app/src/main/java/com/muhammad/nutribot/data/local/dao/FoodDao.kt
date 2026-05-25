@@ -20,6 +20,7 @@ interface FoodDao{
         "DELETE FROM FoodEntity WHERE id = :id"
     )
     fun deleteFoodById(id : Long)
+    @Transaction
     @Query(
         """
             SELECT * FROM FoodEntity

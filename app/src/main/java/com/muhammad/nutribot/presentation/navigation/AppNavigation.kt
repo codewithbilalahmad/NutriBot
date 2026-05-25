@@ -12,6 +12,7 @@ import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealScreen
 import com.muhammad.nutribot.presentation.screens.setting.SettingScreen
+import com.muhammad.nutribot.presentation.screens.streak.StreakScreen
 import com.muhammad.nutribot.presentation.screens.welcome.WelcomeScreen
 import kotlin.reflect.typeOf
 
@@ -54,7 +55,7 @@ fun AppNavigation(
 
             }
             composable<Destination.StreakScreen> {
-
+                StreakScreen(navHostController = navController)
             }
             composable<Destination.StreakProgressScreen> {
 

@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "NutriBot"
 include(":app")
+include(":baselineprofile")

@@ -15,4 +15,5 @@ object Constants {
     const val MEAL_REMINDER_CHANNEL = "meal_reminder_channel"
     const val GEMINI_API_KEY = "AIzaSyA6GTXh-9xgRpnzzXxQpTL0wFbyCicIeDQ"
     const val GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
+    const val BEST_STREAK_PREF_KEY = "best_streak"
 }

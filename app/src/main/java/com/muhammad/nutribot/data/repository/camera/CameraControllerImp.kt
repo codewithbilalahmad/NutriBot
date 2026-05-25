@@ -7,7 +7,6 @@ import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.media.MediaActionSound
-import android.util.Size
 import android.view.OrientationEventListener
 import android.view.Surface
 import androidx.camera.core.Camera
@@ -228,9 +227,6 @@ class CameraControllerImp(
         val imageAnalysis = ImageAnalysis.Builder()
             .setBackpressureStrategy(
                 ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-            )
-            .setTargetResolution(
-                Size(640, 480)
             )
             .setOutputImageFormat(
                 ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888

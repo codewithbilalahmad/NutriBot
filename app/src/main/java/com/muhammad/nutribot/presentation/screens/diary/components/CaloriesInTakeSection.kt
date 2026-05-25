@@ -81,7 +81,7 @@ fun CaloriesInTakeSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(35.dp)
-                .padding(horizontal = 16.dp),
+                .padding(start = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

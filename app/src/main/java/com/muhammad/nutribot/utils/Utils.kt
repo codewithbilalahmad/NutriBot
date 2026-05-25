@@ -14,16 +14,20 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.muhammad.nutribot.NutriBotApplication
+import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
+import kotlin.time.Clock
 
 val MEAL_LABELS = listOf(
     "food",
@@ -77,7 +81,7 @@ val MEAL_LABELS = listOf(
 fun decodeBitmap(
     path: String,
     reqWidth: Int = 300,
-    reqHeight: Int = 300
+    reqHeight: Int = 300,
 ): Bitmap? {
     val context = NutriBotApplication.INSTANCE
     return try {
@@ -210,7 +214,7 @@ fun openPermissionSettings(context: Context) {
     context.startActivity(intent)
 }
 
-fun saveBitmapToFile(bitmap : Bitmap, prefix : String) : String{
+fun saveBitmapToFile(bitmap: Bitmap, prefix: String): String {
     val context = NutriBotApplication.INSTANCE
     val file = File(context.cacheDir, "${prefix}_${System.currentTimeMillis()}.png")
     FileOutputStream(file).use { outputStream ->
@@ -234,3 +238,24 @@ fun resizeBitmap(bitmap: Bitmap): Bitmap {
 fun generateId(): Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
 
 fun LocalTime.toFormattedTime(): String = "%02d:%02d".format(hour, minute)
+
+fun getCurrentWeekDates(): List<LocalDate> {
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val daysFromMonday = today.dayOfWeek.isoDayNumber - 1
+    val monday = today.minus(daysFromMonday, DateTimeUnit.DAY)
+    return (0..6).map { index ->
+        monday.plus(index, DateTimeUnit.DAY)
+    }
+}
+
+fun getCurrentWeekMillis() : Pair<Long, Long>{
+    val timeZone = TimeZone.currentSystemDefault()
+    val today = Clock.System.now()
+        .toLocalDateTime(timeZone)
+        .date
+    val monday = today.minus(today.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
+    val sunday = monday.plus(6, DateTimeUnit.DAY)
+    val startOfWeek = monday.atStartOfDayIn(timeZone).toEpochMilliseconds()
+    val endOfWeek = sunday.atStartOfDayIn(timeZone).toEpochMilliseconds()
+    return startOfWeek to endOfWeek
+}

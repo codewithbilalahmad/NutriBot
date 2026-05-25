@@ -25,6 +25,7 @@ import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailViewMod
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupViewModel
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealViewModel
 import com.muhammad.nutribot.presentation.screens.setting.SettingViewModel
+import com.muhammad.nutribot.presentation.screens.streak.StreakViewModel
 import com.muhammad.nutribot.utils.Constants.DATABASE_NAME
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
@@ -58,4 +59,5 @@ val appModule = module {
     viewModelOf(::SettingViewModel)
     viewModelOf(::ScanMealViewModel)
     viewModelOf(::MealDetailViewModel)
+    viewModelOf(::StreakViewModel)
 }

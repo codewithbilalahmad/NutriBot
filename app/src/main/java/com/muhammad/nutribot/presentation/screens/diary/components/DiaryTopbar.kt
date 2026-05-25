@@ -2,6 +2,7 @@ package com.muhammad.nutribot.presentation.screens.diary.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.presentation.components.calender.WeekCalender
+import com.muhammad.nutribot.utils.rippleClickable
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -40,6 +42,7 @@ fun DiaryTopbar(
     selectedDate: LocalDate,
     weekCalenderPagerState: PagerState,
     onDateSelected: (LocalDate) -> Unit,
+    onStreakClick : () -> Unit,
     onSettingClick: () -> Unit, weekRange: IntRange,
 ) {
     Column(modifier = modifier.background(MaterialTheme.colorScheme.background).statusBarsPadding().padding(bottom = 8.dp)) {
@@ -68,6 +71,7 @@ fun DiaryTopbar(
                             )
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.background)
+                            .rippleClickable(onClick = onStreakClick)
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -48,6 +49,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.lottie.compose)
     implementation(libs.work.runtime.ktx)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
@@ -58,6 +60,8 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.datastore)
     implementation(libs.room.runtime)
+    implementation(libs.androidx.profileinstaller)
+    "baselineProfile"(project(":baselineprofile"))
     ksp(libs.room.compiler)
     implementation(libs.splashscreen)
     implementation(libs.koin.compose)

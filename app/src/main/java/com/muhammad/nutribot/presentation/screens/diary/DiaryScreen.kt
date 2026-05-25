@@ -75,6 +75,8 @@ fun DiaryScreen(
             modifier = Modifier.fillMaxWidth(),
             onSettingClick = {
                 navHostController.navigate(Destination.SettingScreen)
+            }, onStreakClick = {
+                navHostController.navigate(Destination.StreakScreen)
             },
             onDateSelected = { date ->
                 viewModel.onAction(DiaryAction.OnDateSelected(date))
