@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +35,7 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 
 @Composable
-fun StreakSeries(modifier: Modifier = Modifier, weekMeals: List<Food>) {
+fun StreakSeries(modifier: Modifier = Modifier, weekMeals: List<Food>, showShadow : Boolean = true) {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val weekDates = remember(today) {
         getCurrentWeekDates()
@@ -77,13 +76,17 @@ fun StreakSeries(modifier: Modifier = Modifier, weekMeals: List<Food>) {
                 modifier = Modifier
                     .weight(1f)
                     .then(
-                        if (isTodayDate) Modifier else Modifier.dropShadow(
-                            shape = RoundedCornerShape(16.dp), shadow = Shadow(
-                                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                                spread = 2.dp,
-                                radius = 2.dp
+                        when{
+                            isTodayDate -> Modifier
+                            showShadow -> Modifier.dropShadow(
+                                shape = RoundedCornerShape(16.dp), shadow = Shadow(
+                                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                    spread = 2.dp,
+                                    radius = 2.dp
+                                )
                             )
-                        )
+                            else -> Modifier
+                        }
                     )
                     .clip(RoundedCornerShape(16.dp))
                     .border(

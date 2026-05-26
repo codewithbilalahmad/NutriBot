@@ -123,4 +123,6 @@
     <string name="best_streak">Best Streak</string>
     <string name="days">days</string>
     <string name="day">day</string>
+    <string name="days_on_track">days on track!</string>
+    <string name="day_on_track">day on track!</string>
 </resources>

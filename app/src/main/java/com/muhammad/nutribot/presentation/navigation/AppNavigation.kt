@@ -6,13 +6,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.muhammad.nutribot.domain.model.Food
-import com.muhammad.nutribot.domain.model.Ingredient
 import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealScreen
 import com.muhammad.nutribot.presentation.screens.setting.SettingScreen
 import com.muhammad.nutribot.presentation.screens.streak.StreakScreen
+import com.muhammad.nutribot.presentation.screens.streak_progress.StreakProgressScreen
 import com.muhammad.nutribot.presentation.screens.welcome.WelcomeScreen
 import kotlin.reflect.typeOf
 
@@ -58,7 +58,7 @@ fun AppNavigation(
                 StreakScreen(navHostController = navController)
             }
             composable<Destination.StreakProgressScreen> {
-
+                StreakProgressScreen(navHostController = navController)
             }
             composable<Destination.MealDetailScreen>(
                 typeMap = mapOf(typeOf<Food>() to CustomNavTypes.Food)

@@ -2,7 +2,6 @@ package com.muhammad.nutribot.presentation.screens.diary.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,12 +16,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.presentation.components.calender.WeekCalender
+import com.muhammad.nutribot.presentation.theme.FlameYellow
 import com.muhammad.nutribot.utils.rippleClickable
 import kotlinx.datetime.LocalDate
 
@@ -80,7 +80,7 @@ fun DiaryTopbar(
                         )
                     ) {
                         val tint by animateColorAsState(
-                            targetValue = if(streak > 0) Color.Unspecified else MaterialTheme.colorScheme.surface,
+                            targetValue = if(streak > 0) FlameYellow else MaterialTheme.colorScheme.surface,
                             animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
                             label = "tint"
                         )

@@ -76,13 +76,12 @@ fun StreakHeader(modifier: Modifier = Modifier, streak: Int, onBackClick: () -> 
     }
     var streakAnimationHeight by remember { mutableStateOf(0.dp) }
     val infiniteTransition = rememberInfiniteTransition(label = "gradient_animation")
-
     val animatedOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 1000f,
+        targetValue = 2000f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 6000,
+                durationMillis = 12000,
                 easing = LinearEasing
             ),
             repeatMode = RepeatMode.Reverse
