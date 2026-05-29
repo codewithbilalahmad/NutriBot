@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.presentation.screens.meal_details.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -13,8 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -42,15 +41,9 @@ fun MealDateCard(modifier: Modifier = Modifier, selectedDate: LocalDate, onClick
         else -> "${selectedDate.day} ${selectedDate.month.name.lowercase().replaceFirstChar { it.uppercase() }}"
     }
     Card(
-        modifier = modifier.dropShadow(
-            shape = CircleShape,
-            shadow = Shadow(
-                radius = 2.dp,
-                spread = 2.dp,
-                color = MaterialTheme.colorScheme.surfaceContainerLow
-            )
-        ), onClick = onClick,
+        modifier = modifier, onClick = onClick,
         shape = CircleShape,
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
         Row(

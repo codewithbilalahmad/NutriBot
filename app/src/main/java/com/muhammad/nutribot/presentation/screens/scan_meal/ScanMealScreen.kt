@@ -8,7 +8,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -243,11 +243,11 @@ fun ScanMealScreen(
                                     contentDescription = null,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .sharedBounds(
+                                        .sharedElement(
                                             sharedContentState = rememberSharedContentState(key = "meal_image"),
                                             animatedVisibilityScope = animatedVisibilityScope,
                                             boundsTransform = { _, _ ->
-                                                tween(durationMillis = 300, easing = FastOutLinearInEasing)
+                                                tween(durationMillis = 300, easing = LinearEasing)
                                             }
                                         ),
                                     contentScale = ContentScale.Crop
@@ -303,7 +303,7 @@ fun ScanMealScreen(
                                     .fillMaxWidth()
                                     .height(configuration.screenHeightDp.dp * 0.4f)
                                     .padding(horizontal = 24.dp)
-                                    .align(Alignment.Center), isAnalyzingMeal = true
+                                    .align(Alignment.Center), isAnalyzingMeal = false, isMealDetected = state.mealDetected
                             )
                         }
                     }

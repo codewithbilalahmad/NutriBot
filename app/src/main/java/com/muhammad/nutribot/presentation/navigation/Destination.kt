@@ -13,7 +13,7 @@ sealed interface Destination {
     @Serializable
     data object DiaryScreen : Destination
     @Serializable
-    data object ScanMealScreen : Destination
+    data class ScanMealScreen(val galleryUri : String?=null) : Destination
     @Serializable
     data class MealDetailScreen(val food: Food) : Destination
     @Serializable
@@ -24,4 +24,6 @@ sealed interface Destination {
     data object StreakProgressScreen : Destination
     @Serializable
     data object SettingScreen : Destination
+    @Serializable
+    data object FavouriteMealsScreen : Destination
 }

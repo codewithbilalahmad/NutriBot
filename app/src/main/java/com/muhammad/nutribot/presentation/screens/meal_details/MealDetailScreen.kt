@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -62,9 +63,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.muhammad.nutribot.R
+import com.muhammad.nutribot.domain.model.EditMealOption
 import com.muhammad.nutribot.presentation.components.button.PrimaryButton
 import com.muhammad.nutribot.presentation.components.button.SecondaryButton
 import com.muhammad.nutribot.presentation.components.image.AppImage
+import com.muhammad.nutribot.presentation.components.textfield.AppTextField
 import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.meal_details.components.HeartLikeAnimation
 import com.muhammad.nutribot.presentation.screens.meal_details.components.MealDateCard
@@ -73,6 +76,7 @@ import com.muhammad.nutribot.presentation.screens.meal_details.components.MealNu
 import com.muhammad.nutribot.presentation.screens.meal_details.components.NumberOfServingsSection
 import com.muhammad.nutribot.presentation.screens.meal_details.components.TotalCaloriesCard
 import com.muhammad.nutribot.utils.ObserveAsEvents
+import com.muhammad.nutribot.utils.rippleClickable
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
@@ -86,7 +90,7 @@ fun MealDetailScreen(
     navHostController: NavHostController,
     viewModel: MealDetailViewModel = koinViewModel(),
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val density = LocalDensity.current
     val gradientHeight = 100.dp
@@ -100,7 +104,7 @@ fun MealDetailScreen(
     val heartScale = remember { Animatable(1f) }
     var showLikeAnimation by remember { mutableStateOf(false) }
     LaunchedEffect(food.isFavorite) {
-        if(food.isFavorite){
+        if (food.isFavorite) {
             showLikeAnimation = true
             heartScale.snapTo(0f)
             launch {
@@ -115,24 +119,39 @@ fun MealDetailScreen(
             }
         }
     }
-    val datePickerState = rememberDatePickerState(initialSelectedDate = state.selectedDate.toJavaLocalDate(), selectableDates = object : SelectableDates{
-        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-            val today = Clock.System.now()
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .date
-            val date = Instant.fromEpochMilliseconds(utcTimeMillis).toLocalDateTime(TimeZone.currentSystemDefault()).date
-            return date <= today
-        }
-    })
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDate = state.selectedDate.toJavaLocalDate(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val today = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+                val date = Instant.fromEpochMilliseconds(utcTimeMillis)
+                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                return date <= today
+            }
+        })
     val scrollOffset by remember {
         derivedStateOf {
             listState.firstVisibleItemScrollOffset
         }
     }
-    ObserveAsEvents(viewModel.events) {event ->
-        when(event){
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
             MealDetailEvent.OnMealLoggedSuccess -> {
-                navHostController.navigate(Destination.StreakProgressScreen)
+                if(state.isAlreadyLogged){
+                    navHostController.navigate(Destination.DiaryScreen){
+                        popUpTo<Destination.MealDetailScreen>{
+                            inclusive = true
+                        }
+                    }
+                } else{
+                    navHostController.navigate(Destination.StreakProgressScreen){
+                        popUpTo<Destination.MealDetailScreen>{
+                            inclusive = true
+                        }
+                    }
+                }
             }
         }
     }
@@ -145,7 +164,7 @@ fun MealDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
                 PrimaryButton(
-                    text = "${stringResource(R.string.log_to)} ${state.selectedDate.day} ${
+                    text = if(state.isAlreadyLogged) stringResource(R.string.done) else "${stringResource(R.string.log_to)} ${state.selectedDate.day} ${
                         state.selectedDate.month.name.lowercase()
                             .replaceFirstChar { it.uppercase() }
                     }",
@@ -241,7 +260,7 @@ fun MealDetailScreen(
                             Icon(
                                 imageVector = ImageVector.vectorResource(icon),
                                 contentDescription = null,
-                                modifier = Modifier.graphicsLayer{
+                                modifier = Modifier.graphicsLayer {
                                     scaleX = heartScale.value
                                     scaleY = heartScale.value
                                 },
@@ -279,6 +298,13 @@ fun MealDetailScreen(
                                     horizontal = 12.dp,
                                     vertical = 6.dp
                                 )
+                                .rippleClickable(onClick = {
+                                    viewModel.onAction(
+                                        MealDetailAction.OnEditMealOptionClick(
+                                            EditMealOption.NAME
+                                        )
+                                    )
+                                })
                         )
 
                         Spacer(Modifier.height(12.dp))
@@ -289,10 +315,22 @@ fun MealDetailScreen(
                                 .padding(horizontal = 16.dp),
                             food = food,
                             onAddServings = {
-                                viewModel.onAction(MealDetailAction.OnChangeMealNumberOfServings((food.numberOfServings + 1).coerceAtMost(10)))
+                                viewModel.onAction(
+                                    MealDetailAction.OnChangeMealNumberOfServings(
+                                        (food.numberOfServings + 1).coerceAtMost(
+                                            10
+                                        )
+                                    )
+                                )
                             },
                             onMinusServings = {
-                                viewModel.onAction(MealDetailAction.OnChangeMealNumberOfServings((food.numberOfServings - 1).coerceAtLeast(1)))
+                                viewModel.onAction(
+                                    MealDetailAction.OnChangeMealNumberOfServings(
+                                        (food.numberOfServings - 1).coerceAtLeast(
+                                            1
+                                        )
+                                    )
+                                )
                             }
                         )
 
@@ -303,7 +341,13 @@ fun MealDetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                             food = food,
-                            onClick = {}
+                            onClick = {
+                                viewModel.onAction(
+                                    MealDetailAction.OnEditMealOptionClick(
+                                        EditMealOption.CALORIES
+                                    )
+                                )
+                            }
                         )
 
                         Spacer(Modifier.height(16.dp))
@@ -312,9 +356,27 @@ fun MealDetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                             food = food,
-                            onFatClick = {},
-                            onCarbsClick = {},
-                            onProteinClick = {}
+                            onFatClick = {
+                                viewModel.onAction(
+                                    MealDetailAction.OnEditMealOptionClick(
+                                        EditMealOption.FATS
+                                    )
+                                )
+                            },
+                            onCarbsClick = {
+                                viewModel.onAction(
+                                    MealDetailAction.OnEditMealOptionClick(
+                                        EditMealOption.CARBS
+                                    )
+                                )
+                            },
+                            onProteinClick = {
+                                viewModel.onAction(
+                                    MealDetailAction.OnEditMealOptionClick(
+                                        EditMealOption.PROTEIN
+                                    )
+                                )
+                            }
                         )
                         Spacer(Modifier.height(16.dp))
                         Text(
@@ -333,7 +395,11 @@ fun MealDetailScreen(
                                         .fillMaxWidth()
                                         .padding(horizontal = 16.dp),
                                     onClick = {
-                                        viewModel.onAction(MealDetailAction.OnToggleIngredientSelection(id = ingredient.id))
+                                        viewModel.onAction(
+                                            MealDetailAction.OnToggleIngredientSelection(
+                                                id = ingredient.id
+                                            )
+                                        )
                                     })
                                 Spacer(Modifier.height(8.dp))
                             }
@@ -405,15 +471,55 @@ fun MealDetailScreen(
                     contentDescription = null
                 )
             }
-            MealDateCard(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
-                selectedDate = state.selectedDate, onClick = {
-                    viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog)
-                }
-            )
+            if(!state.isAlreadyLogged){
+                MealDateCard(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 8.dp),
+                    selectedDate = state.selectedDate, onClick = {
+                        viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog)
+                    }
+                )
+            }
         }
+    }
+    if (state.showEditMealDialog) {
+        AlertDialog(onDismissRequest = {
+            viewModel.onAction(MealDetailAction.OnDismissEditMealDialog)
+        }, title = {
+            val title = when(state.selectedEditMealOption){
+                EditMealOption.NONE -> ""
+                EditMealOption.NAME -> { stringResource(R.string.edit_food_name_title) }
+                EditMealOption.CALORIES -> { stringResource(R.string.edit_calories_title) }
+                EditMealOption.FATS -> { stringResource(R.string.edit_fat_title) }
+                EditMealOption.CARBS -> { stringResource(R.string.edit_carbs_title) }
+                EditMealOption.PROTEIN -> { stringResource(R.string.edit_protein_title) }
+            }
+            val desp = when(state.selectedEditMealOption){
+                EditMealOption.NONE -> ""
+                EditMealOption.NAME -> { stringResource(R.string.edit_food_name_desp) }
+                EditMealOption.CALORIES -> { stringResource(R.string.edit_calories_desp) }
+                EditMealOption.FATS -> { stringResource(R.string.edit_fat_desp) }
+                EditMealOption.CARBS -> { stringResource(R.string.edit_carbs_desp) }
+                EditMealOption.PROTEIN -> { stringResource(R.string.edit_protein_desp) }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)){
+                Text(text = title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                Text(text = desp, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.surface))
+            }
+        }, containerColor = MaterialTheme.colorScheme.background, text = {
+            AppTextField(state = state.editMealState, modifier = Modifier.fillMaxWidth(), trailingIcon = R.drawable.ic_cancel_filled, onTrailingClick = {
+                viewModel.onAction(MealDetailAction.OnClearEditMealState)
+            }, textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light))
+        }, dismissButton = {
+            SecondaryButton(text = stringResource(R.string.cancel), onClick = {
+                viewModel.onAction(MealDetailAction.OnDismissEditMealDialog)
+            })
+        }, confirmButton = {
+            PrimaryButton(text = stringResource(R.string.save), onClick = {
+                viewModel.onAction(MealDetailAction.OnSaveEditMealOption)
+            })
+        })
     }
     if (state.showDatePickerDialog) {
         DatePickerDialog(
@@ -426,14 +532,16 @@ fun MealDetailScreen(
                 PrimaryButton(text = stringResource(R.string.done), onClick = {
                     viewModel.onAction(MealDetailAction.OnToggleDatePickerDialog)
                     val selectedDateMillis = datePickerState.selectedDateMillis
-                    if(selectedDateMillis != null){
-                        val selectedDate = Instant.fromEpochMilliseconds(selectedDateMillis).toLocalDateTime(
-                            TimeZone.currentSystemDefault()).date
+                    if (selectedDateMillis != null) {
+                        val selectedDate =
+                            Instant.fromEpochMilliseconds(selectedDateMillis).toLocalDateTime(
+                                TimeZone.currentSystemDefault()
+                            ).date
                         viewModel.onAction(MealDetailAction.OnChangeSelectedDate(date = selectedDate))
                     }
                 })
             }, content = {
-                DatePicker(state= datePickerState)
+                DatePicker(state = datePickerState)
             })
     }
 }

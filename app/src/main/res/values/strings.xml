@@ -125,4 +125,14 @@
     <string name="day">day</string>
     <string name="days_on_track">days on track!</string>
     <string name="day_on_track">day on track!</string>
+    <string name="edit_food_name_title">Edit food name</string>
+    <string name="edit_calories_title">Edit Calories</string>
+    <string name="edit_fat_title">Edit Fats</string>
+    <string name="edit_carbs_title">Edit Carbs</string>
+    <string name="edit_protein_title">Edit Protein</string>
+    <string name="edit_food_name_desp">A short name is best</string>
+    <string name="edit_calories_desp">Input data for one dish</string>
+    <string name="edit_fat_desp">Input data for one dish</string>
+    <string name="edit_carbs_desp">Input data for one dish</string>
+    <string name="edit_protein_desp">Input data for one dish</string>
 </resources>

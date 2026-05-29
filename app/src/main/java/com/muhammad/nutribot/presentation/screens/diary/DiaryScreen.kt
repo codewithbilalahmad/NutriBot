@@ -1,5 +1,8 @@
 package com.muhammad.nutribot.presentation.screens.diary
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -68,8 +71,12 @@ fun DiaryScreen(
                     listState.firstVisibleItemScrollOffset
         }
     }
-    val weekCalenderPagerState =
-        rememberPagerState(initialPage = weekRange.count() - 1) { weekRange.count() }
+    val weekCalenderPagerState = rememberPagerState(initialPage = weekRange.count() - 1) { weekRange.count() }
+    val galleryPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {uri ->
+        if(uri != null){
+            navHostController.navigate(Destination.ScanMealScreen(galleryUri = uri.toString()))
+        }
+    }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DiaryTopbar(
             modifier = Modifier.fillMaxWidth(),
@@ -259,7 +266,7 @@ fun DiaryScreen(
                     icon = R.drawable.ic_scan_meal,
                     onClick = {
                         viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
-                        navHostController.navigate(Destination.ScanMealScreen)
+                        navHostController.navigate(Destination.ScanMealScreen())
                     })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
@@ -267,6 +274,7 @@ fun DiaryScreen(
                     icon = R.drawable.ic_gallery,
                     onClick = {
                         viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
+                        galleryPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
@@ -282,6 +290,7 @@ fun DiaryScreen(
                     icon = R.drawable.ic_favourite_filled,
                     onClick = {
                         viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
+                        navHostController.navigate(Destination.FavouriteMealsScreen)
                     })
             }
         })

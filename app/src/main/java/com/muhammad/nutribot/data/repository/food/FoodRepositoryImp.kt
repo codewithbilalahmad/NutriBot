@@ -35,6 +35,12 @@ class FoodRepositoryImp(
         }
     }
 
+    override fun getFavouriteFoods(): Flow<List<Food>> {
+        return foodDao.getFavouriteFoods().map { entities ->
+            entities.map { it.toFood() }
+        }
+    }
+
     override fun getFoodStreak(): Flow<Int> {
         return foodDao.getFoodStreak()
     }

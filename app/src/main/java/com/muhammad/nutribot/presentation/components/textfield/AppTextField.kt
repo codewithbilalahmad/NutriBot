@@ -113,7 +113,7 @@ fun AppTextField(
                         imageVector = ImageVector.vectorResource(trailingIcon),
                         contentDescription = null,
                         modifier = Modifier.rippleClickable(onClick = onTrailingClick),
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
             }

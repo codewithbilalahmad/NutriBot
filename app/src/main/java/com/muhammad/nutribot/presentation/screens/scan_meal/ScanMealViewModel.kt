@@ -2,6 +2,7 @@ package com.muhammad.nutribot.presentation.screens.scan_meal
 
 import android.graphics.Bitmap
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
@@ -35,9 +36,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 class ScanMealViewModel(
+    savedStateHandle: SavedStateHandle,
     val cameraController: CameraController,
 ) : ViewModel() {
     private val context = NutriBotApplication.INSTANCE
+    private val galleryUri = savedStateHandle.get<String?>("galleryUri")
     private var analyzingStepJob: Job? = null
     private val json = Json {
         ignoreUnknownKeys = true
@@ -59,6 +62,9 @@ class ScanMealViewModel(
         generativeModel = GenerativeModel(
             modelName = GEMINI_MODEL_NAME, apiKey = GEMINI_API_KEY, generationConfig = config
         )
+        if(galleryUri != null){
+            onAction(ScanMealAction.OnPickMealGalleryImage(uri = galleryUri, lifecycleOwner = context as LifecycleOwner))
+        }
     }
 
     fun onAction(action: ScanMealAction) {

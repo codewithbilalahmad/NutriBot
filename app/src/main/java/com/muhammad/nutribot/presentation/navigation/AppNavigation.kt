@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
+import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMealsScreen
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealScreen
@@ -20,8 +21,7 @@ import kotlin.reflect.typeOf
 fun AppNavigation(
     navController: NavHostController, isUserLoggedIn: Boolean, isInternetConnected: Boolean,
 ) {
-    val startDestination =
-        if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
+    val startDestination = if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
     SharedTransitionLayout {
         NavHost(navController = navController, startDestination = startDestination) {
             composable<Destination.WelcomeScreen> {
@@ -68,6 +68,9 @@ fun AppNavigation(
                     animatedVisibilityScope = this,
                     sharedTransitionScope = this@SharedTransitionLayout
                 )
+            }
+            composable<Destination.FavouriteMealsScreen>{
+                FavouriteMealsScreen(navHostController = navController)
             }
         }
     }

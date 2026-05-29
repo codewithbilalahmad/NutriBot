@@ -32,10 +32,10 @@ fun Sparkles(
     val infiniteTransition = rememberInfiniteTransition()
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 360f,
+        targetValue = 720f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 1500,
+                durationMillis = 3000,
                 easing = FastOutSlowInEasing
             ),
             repeatMode = RepeatMode.Reverse

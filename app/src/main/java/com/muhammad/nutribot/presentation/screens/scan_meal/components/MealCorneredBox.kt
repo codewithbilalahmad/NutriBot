@@ -38,6 +38,7 @@ fun MealCorneredBox(
     scannerColor: Color = MaterialTheme.colorScheme.primary,
     containerColor: Color = Color.Transparent,
     isAnalyzingMeal: Boolean,
+    isMealDetected : Boolean = false,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     strokeWidth: Dp = 4.dp,
     cornerLength: Dp = 80.dp,
@@ -156,7 +157,7 @@ fun MealCorneredBox(
         contentAlignment = Alignment.Center
     ) {
         content()
-        if (isAnalyzingMeal) {
+        if (isAnalyzingMeal || isMealDetected) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
