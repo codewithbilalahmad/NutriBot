@@ -37,20 +37,28 @@ import com.muhammad.nutribot.presentation.screens.meal_details.components.Ingred
 import com.muhammad.nutribot.presentation.theme.CarbsColor
 import com.muhammad.nutribot.presentation.theme.FatColor
 import com.muhammad.nutribot.presentation.theme.ProteinColor
+import com.muhammad.nutribot.utils.rippleClickable
 import com.muhammad.nutribot.utils.toFormattedTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @Composable
-fun FavouriteMealCard(modifier: Modifier = Modifier, meal: Food, onClick: () -> Unit) {
+fun FavouriteMealCard(
+    modifier: Modifier = Modifier,
+    meal: Food,
+    onClick: (Food) -> Unit,
+    onUnFavouriteMeal: (Long) -> Unit
+) {
     val dateTime = remember(meal.eatenAt) {
         Instant.fromEpochMilliseconds(meal.eatenAt).toLocalDateTime(TimeZone.currentSystemDefault())
     }
     Box(modifier = modifier) {
         Card(
             modifier = modifier,
-            onClick = onClick,
+            onClick = {
+                onClick(meal)
+            },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant)
@@ -153,7 +161,11 @@ fun FavouriteMealCard(modifier: Modifier = Modifier, meal: Food, onClick: () -> 
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = CircleShape
-                ).background(color = MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center
+                )
+                .background(color = MaterialTheme.colorScheme.background).rippleClickable{
+                    onUnFavouriteMeal(meal.id)
+                },
+            contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_delete),

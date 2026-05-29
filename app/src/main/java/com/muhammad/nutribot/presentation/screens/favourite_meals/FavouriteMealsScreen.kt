@@ -25,14 +25,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.muhammad.nutribot.R
+import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.favourite_meals.components.FavouriteMealCard
+import com.muhammad.nutribot.utils.ObserveAsEvents
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -40,8 +41,18 @@ fun FavouriteMealsScreen(
     navHostController: NavHostController,
     viewModel: FavouriteMealsViewModel = koinViewModel(),
 ) {
-    val layoutDirection = LocalLayoutDirection.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    ObserveAsEvents(viewModel.events) {event ->
+        when(event){
+            FavouriteMealsEvent.OnMealLoggedSuccess ->{
+                navHostController.navigate(Destination.DiaryScreen){
+                    popUpTo<Destination.FavouriteMealsScreen>{
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         CenterAlignedTopAppBar(
             title = {
@@ -82,8 +93,10 @@ fun FavouriteMealsScreen(
                             .fillMaxWidth()
                             .animateItem(),
                         meal = favouriteMeal,
-                        onClick = {
-
+                        onClick = {meal ->
+                            viewModel.onAction(FavouriteMealsAction.OnLogMeal(meal))
+                        }, onUnFavouriteMeal = {id ->
+                            viewModel.onAction(FavouriteMealsAction.OnUnFavouriteMeal(id))
                         })
                 }
             }
