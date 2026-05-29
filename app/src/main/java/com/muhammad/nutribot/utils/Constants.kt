@@ -1,5 +1,6 @@
 package com.muhammad.nutribot.utils
 
+
 object Constants {
     const val DATABASE_NAME = "NutriBotDatabase.db"
     const val DATA_STORE_FILE_NAME = "app_settings.preferences_pb"
@@ -13,7 +14,7 @@ object Constants {
     const val LUNCH_REMINDER = "launch_reminder"
     const val DINNER_REMINDER = "dinner_reminder"
     const val MEAL_REMINDER_CHANNEL = "meal_reminder_channel"
-    const val GEMINI_API_KEY = "AQ.Ab8RN6L1SpWzR0Pz7Pa4tuOctfsM3Qm4o2KTh_faLMx3Mlcdxg"
+    const val GEMINI_API_KEY = BuildConfig.API_KEY
     const val GEMINI_MODEL_NAME = "gemini-2.5-flash-lite"
     const val BEST_STREAK_PREF_KEY = "best_streak"
 }
