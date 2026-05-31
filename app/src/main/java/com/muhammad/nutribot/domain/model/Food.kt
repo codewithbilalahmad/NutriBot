@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 data class Food(
     val id : Long,
     val name : String,
+    val servingSize : String = "",
     val mealImageUrl : String = "",
     val calories : Int,
     val protein : Int,

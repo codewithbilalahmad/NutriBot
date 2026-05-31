@@ -6,18 +6,23 @@ import androidx.room.Room
 import com.muhammad.nutribot.NutriBotApplication
 import com.muhammad.nutribot.data.local.NutriBotDatabase
 import com.muhammad.nutribot.data.reminders.MealReminderSchedulerImp
+import com.muhammad.nutribot.data.remote.network.SearchFoodNetworkImp
+import com.muhammad.nutribot.data.remote.network.network.HttpClientFactory
+import com.muhammad.nutribot.data.remote.repository.SearchFoodRespositoryImp
 import com.muhammad.nutribot.data.repository.camera.CameraControllerImp
 import com.muhammad.nutribot.data.repository.connection.AndroidConnectivityObserver
 import com.muhammad.nutribot.data.repository.food.FoodRepositoryImp
 import com.muhammad.nutribot.data.repository.ingredient.IngredientRepositoryImp
 import com.muhammad.nutribot.data.repository.nutrition_calculation.NutritionCalculationRepositoryImp
 import com.muhammad.nutribot.data.repository.settings.SettingRepositoryImp
+import com.muhammad.nutribot.domain.network.SearchFoodNetwork
 import com.muhammad.nutribot.domain.repository.camera.CameraController
 import com.muhammad.nutribot.domain.repository.connection.ConnectivityObserver
 import com.muhammad.nutribot.domain.repository.food.FoodRepository
 import com.muhammad.nutribot.domain.repository.ingredient.IngredientRepository
 import com.muhammad.nutribot.domain.repository.nutrition_calculation.NutritionCalculationRepository
 import com.muhammad.nutribot.domain.repository.reminder.MealReminderScheduler
+import com.muhammad.nutribot.domain.repository.search_food.SearchFoodRespository
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import com.muhammad.nutribot.main.MainViewModel
 import com.muhammad.nutribot.presentation.screens.diary.DiaryViewModel
@@ -38,6 +43,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { NutriBotApplication.INSTANCE }
+    single { HttpClientFactory.createClient() }
     singleOf(::AndroidConnectivityObserver).bind<ConnectivityObserver>()
     singleOf(::MealReminderSchedulerImp).bind<MealReminderScheduler>()
     singleOf(::CameraControllerImp).bind<CameraController>()
@@ -51,10 +57,15 @@ val appModule = module {
     single {
         get<NutriBotDatabase>().ingredientDao()
     }
+    single {
+        get<NutriBotDatabase>().historyFoodDao()
+    }
+    singleOf(::SearchFoodNetworkImp).bind<SearchFoodNetwork>()
     singleOf(::FoodRepositoryImp).bind<FoodRepository>()
     singleOf(::IngredientRepositoryImp).bind<IngredientRepository>()
     singleOf(::SettingRepositoryImp).bind<SettingRepository>()
     singleOf(::NutritionCalculationRepositoryImp).bind<NutritionCalculationRepository>()
+    singleOf(::SearchFoodRespositoryImp).bind<SearchFoodRespository>()
     viewModelOf(::MainViewModel)
     viewModelOf(::NutritionSetupViewModel)
     viewModelOf(::DiaryViewModel)

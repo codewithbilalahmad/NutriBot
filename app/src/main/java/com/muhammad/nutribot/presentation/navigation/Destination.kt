@@ -26,4 +26,6 @@ sealed interface Destination {
     data object SettingScreen : Destination
     @Serializable
     data object FavouriteMealsScreen : Destination
+    @Serializable
+    data object SearchMealScreen : Destination
 }

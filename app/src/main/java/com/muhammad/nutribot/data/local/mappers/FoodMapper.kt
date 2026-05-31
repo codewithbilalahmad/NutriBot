@@ -10,6 +10,7 @@ fun FoodWithWithIngredients.toFood(): Food {
         name = food.name,
         calories = food.calories,
         fat = food.fat,
+        servingSize = food.servingSize,
         protein = food.protein,
         mealImageUrl = food.mealImageUrl,
         carbs = food.carbs,
@@ -27,6 +28,7 @@ fun FoodEntity.toFood(): Food {
         name = name,
         calories = calories,
         fat = fat,
+        servingSize = servingSize,
         protein = protein,
         carbs = carbs,
         eatenAt = eatenAt,
@@ -42,6 +44,7 @@ fun Food.toFoodEntity(): FoodEntity {
     return FoodEntity(
         id = id,
         name = name,
+        servingSize = servingSize,
         mealImageUrl = mealImageUrl,
         calories = calories,
         fat = fat,

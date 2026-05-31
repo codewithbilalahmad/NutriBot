@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -26,6 +27,16 @@ android {
             "String",
             "API_KEY",
             "\"${project.findProperty("API_KEY")}\""
+        )
+        buildConfigField(
+            "String",
+            "FOOD_SEARCH_BASE_URL",
+            "\"${project.findProperty("FOOD_SEARCH_BASE_URL")}\""
+        )
+        buildConfigField(
+            "String",
+            "FOOD_SEARCH_API_KEY",
+            "\"${project.findProperty("FOOD_SEARCH_API_KEY")}\""
         )
     }
 
@@ -56,6 +67,7 @@ android {
 
 dependencies {
     implementation(libs.lottie.compose)
+    implementation(libs.bundles.ktor)
     implementation(libs.work.runtime.ktx)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
