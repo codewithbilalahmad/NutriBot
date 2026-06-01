@@ -238,7 +238,11 @@ fun resizeBitmap(bitmap: Bitmap): Bitmap {
 
 fun generateId(): Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
 
-fun LocalTime.toFormattedTime(): String = "%02d:%02d".format(hour, minute)
+fun LocalTime.toFormattedTime(): String {
+    val amPm = if(hour > 12) "Pm" else "Am"
+    val hour = if (hour > 12) hour - 12 else hour
+    return "${"%02d:%02d".format(hour, minute)} $amPm"
+}
 
 fun getCurrentWeekDates(): List<LocalDate> {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -249,7 +253,7 @@ fun getCurrentWeekDates(): List<LocalDate> {
     }
 }
 
-fun getCurrentWeekMillis() : Pair<Long, Long>{
+fun getCurrentWeekMillis(): Pair<Long, Long> {
     val timeZone = TimeZone.currentSystemDefault()
     val today = Clock.System.now()
         .toLocalDateTime(timeZone)

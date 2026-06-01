@@ -41,7 +41,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.muhammad.nutribot.utils.rippleClickable
 
@@ -54,6 +53,7 @@ fun AppTextField(
     readOnly: Boolean = false,
     onClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.MultiLine(2),
     shape : Shape = RoundedCornerShape(16.dp),
     contentAlignment: Arrangement.Horizontal = Arrangement.Start,
     boxContentAlignment: Alignment = Alignment.TopStart,
@@ -77,7 +77,7 @@ fun AppTextField(
         enabled = enabled,
         textStyle = textStyle,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 2),
+        lineLimits = lineLimits,
         readOnly = readOnly,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.surface),
         modifier = modifier

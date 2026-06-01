@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -621,6 +622,7 @@ fun MealDetailScreen(
             AppTextField(
                 state = state.editMealState,
                 modifier = Modifier.fillMaxWidth(),
+                lineLimits = TextFieldLineLimits.SingleLine,
                 trailingIcon = R.drawable.ic_cancel_filled,
                 onTrailingClick = {
                     viewModel.onAction(MealDetailAction.OnClearEditMealState)
