@@ -9,6 +9,8 @@ import com.muhammad.nutribot.domain.model.EditMealOption
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.domain.repository.food.FoodRepository
 import com.muhammad.nutribot.domain.repository.ingredient.IngredientRepository
+import com.muhammad.nutribot.utils.decodeBitmap
+import com.muhammad.nutribot.utils.saveBitmapToFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +50,23 @@ class MealDetailViewModel(
             is MealDetailAction.OnEditMealOptionClick -> onEditMealOptionClick(action.option)
             MealDetailAction.OnSaveEditMealOption -> onSaveEditMealOption()
             MealDetailAction.OnClearEditMealState -> onClearEditMealState()
+            is MealDetailAction.OnSelectMealImage -> onSelectMealImage(action.uri)
+        }
+    }
+
+    private fun onSelectMealImage(uri: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val bitmap = decodeBitmap(path = uri) ?: return@launch
+            val imageUrl = saveBitmapToFile(bitmap = bitmap, prefix = "meal_image")
+            withContext(Dispatchers.Main) {
+                _state.update { currentState ->
+                    currentState.copy(
+                        food = currentState.food.copy(
+                            mealImageUrl = imageUrl
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -60,7 +79,7 @@ class MealDetailViewModel(
             val food = currentState.food
             val editMealValue = currentState.editMealState.text.toString()
             val selectedEditMealOption = currentState.selectedEditMealOption
-            val newFood =when(selectedEditMealOption){
+            val newFood = when (selectedEditMealOption) {
                 EditMealOption.NONE -> food
                 EditMealOption.NAME -> food.copy(name = editMealValue)
                 EditMealOption.CALORIES -> food.copy(calories = editMealValue.toInt())
@@ -109,15 +128,16 @@ class MealDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val food = state.value.food
             val isAlreadyLogged = state.value.isAlreadyLogged
-            if(isAlreadyLogged){
+            if (isAlreadyLogged) {
                 foodRepository.upsertFood(food = food)
-            } else{
+            } else {
                 val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 val selectedDateTime = LocalDateTime(
                     date = state.value.selectedDate,
                     time = now.time
                 )
-                val eatenAt = selectedDateTime.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                val eatenAt = selectedDateTime.toInstant(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds()
                 foodRepository.upsertFood(food = food.copy(eatenAt = eatenAt))
                 food.ingredients.forEach { ingredient ->
                     ingredientRepository.upsertIngredient(ingredient = ingredient)

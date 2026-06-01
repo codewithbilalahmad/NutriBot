@@ -12,6 +12,7 @@ import com.muhammad.nutribot.data.remote.repository.SearchFoodRespositoryImp
 import com.muhammad.nutribot.data.repository.camera.CameraControllerImp
 import com.muhammad.nutribot.data.repository.connection.AndroidConnectivityObserver
 import com.muhammad.nutribot.data.repository.food.FoodRepositoryImp
+import com.muhammad.nutribot.data.repository.food_history.FoodHistoryRespositoryImp
 import com.muhammad.nutribot.data.repository.ingredient.IngredientRepositoryImp
 import com.muhammad.nutribot.data.repository.nutrition_calculation.NutritionCalculationRepositoryImp
 import com.muhammad.nutribot.data.repository.settings.SettingRepositoryImp
@@ -19,6 +20,7 @@ import com.muhammad.nutribot.domain.network.SearchFoodNetwork
 import com.muhammad.nutribot.domain.repository.camera.CameraController
 import com.muhammad.nutribot.domain.repository.connection.ConnectivityObserver
 import com.muhammad.nutribot.domain.repository.food.FoodRepository
+import com.muhammad.nutribot.domain.repository.food_history.FoodHistoryRespository
 import com.muhammad.nutribot.domain.repository.ingredient.IngredientRepository
 import com.muhammad.nutribot.domain.repository.nutrition_calculation.NutritionCalculationRepository
 import com.muhammad.nutribot.domain.repository.reminder.MealReminderScheduler
@@ -30,6 +32,7 @@ import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMeals
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailViewModel
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupViewModel
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealViewModel
+import com.muhammad.nutribot.presentation.screens.search_meal.SearchMealViewModel
 import com.muhammad.nutribot.presentation.screens.setting.SettingViewModel
 import com.muhammad.nutribot.presentation.screens.streak.StreakViewModel
 import com.muhammad.nutribot.presentation.screens.streak_progress.StreakProgressViewModel
@@ -62,6 +65,7 @@ val appModule = module {
     }
     singleOf(::SearchFoodNetworkImp).bind<SearchFoodNetwork>()
     singleOf(::FoodRepositoryImp).bind<FoodRepository>()
+    singleOf(::FoodHistoryRespositoryImp).bind<FoodHistoryRespository>()
     singleOf(::IngredientRepositoryImp).bind<IngredientRepository>()
     singleOf(::SettingRepositoryImp).bind<SettingRepository>()
     singleOf(::NutritionCalculationRepositoryImp).bind<NutritionCalculationRepository>()
@@ -75,4 +79,5 @@ val appModule = module {
     viewModelOf(::StreakViewModel)
     viewModelOf(::StreakProgressViewModel)
     viewModelOf(::FavouriteMealsViewModel)
+    viewModelOf(::SearchMealViewModel)
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -53,6 +54,9 @@ fun AppTextField(
     readOnly: Boolean = false,
     onClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
+    shape : Shape = RoundedCornerShape(16.dp),
+    contentAlignment: Arrangement.Horizontal = Arrangement.Start,
+    boxContentAlignment: Alignment = Alignment.TopStart,
     leadingIcon: Int? = null, contentPadding: PaddingValues = PaddingValues(16.dp),
     trailingIcon: Int? = null,
     textStyle : TextStyle = MaterialTheme.typography.headlineLarge.copy(
@@ -77,9 +81,9 @@ fun AppTextField(
         readOnly = readOnly,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.surface),
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(16.dp))
+            .border(width = 1.dp, color = borderColor, shape = shape)
             .clickable(onClick = onClick)
             .padding(contentPadding)
             .onFocusChanged {
@@ -87,18 +91,18 @@ fun AppTextField(
             }, decorator = { innerTextField ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = contentAlignment,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (leadingIcon != null) {
                     Icon(
                         imageVector = ImageVector.vectorResource(leadingIcon),
                         contentDescription = null, modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.surface
                     )
                     Spacer(Modifier.width(8.dp))
                 }
-                Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                Box(Modifier.weight(1f), contentAlignment = boxContentAlignment) {
                     if (state.text.isEmpty() && hint != null) {
                         Text(
                             text = stringResource(hint),
@@ -113,7 +117,7 @@ fun AppTextField(
                         imageVector = ImageVector.vectorResource(trailingIcon),
                         contentDescription = null,
                         modifier = Modifier.rippleClickable(onClick = onTrailingClick),
-                        tint = MaterialTheme.colorScheme.surfaceVariant
+                        tint = MaterialTheme.colorScheme.surface
                     )
                 }
             }

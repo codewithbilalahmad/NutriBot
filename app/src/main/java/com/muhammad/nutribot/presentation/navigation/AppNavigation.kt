@@ -11,6 +11,7 @@ import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMeals
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealScreen
+import com.muhammad.nutribot.presentation.screens.search_meal.SearchMealScreen
 import com.muhammad.nutribot.presentation.screens.setting.SettingScreen
 import com.muhammad.nutribot.presentation.screens.streak.StreakScreen
 import com.muhammad.nutribot.presentation.screens.streak_progress.StreakProgressScreen
@@ -71,6 +72,9 @@ fun AppNavigation(
             }
             composable<Destination.FavouriteMealsScreen>{
                 FavouriteMealsScreen(navHostController = navController)
+            }
+            composable<Destination.SearchMealScreen>{
+                SearchMealScreen(navHostController = navController,sharedTransitionScope = this@SharedTransitionLayout,animatedVisibilityScope = this)
             }
         }
     }

@@ -6,15 +6,17 @@ import com.muhammad.nutribot.data.local.dao.FoodDao
 import com.muhammad.nutribot.data.local.dao.HistoryFoodDao
 import com.muhammad.nutribot.data.local.dao.IngredientDao
 import com.muhammad.nutribot.data.local.entity.FoodEntity
+import com.muhammad.nutribot.data.local.entity.HistoryFoodEntity
 import com.muhammad.nutribot.data.local.entity.IngredientEntity
 
 @Database(
     entities = [
         FoodEntity::class,
-        IngredientEntity::class
+        IngredientEntity::class,
+        HistoryFoodEntity::class
     ],
     exportSchema = true,
-    version = 4
+    version = 5
 )
 abstract class NutriBotDatabase : RoomDatabase() {
     abstract fun foodDao(): FoodDao

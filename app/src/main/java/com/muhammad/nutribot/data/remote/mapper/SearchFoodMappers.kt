@@ -9,6 +9,7 @@ fun FoodSearchDto.toFood() : Food{
         id = id,
         name = title,
         mealImageUrl = image,
+        servingSize = "${nutrition.weightPerServing?.amount?.toInt() ?: 0} ${nutrition.weightPerServing?.unit}",
         calories = get("Calories"),
         carbs = get("Carbohydrates"),
         fat = get("Fat"),

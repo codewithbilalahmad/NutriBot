@@ -204,6 +204,8 @@ fun NutritionSetupScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp),
+                                    contentAlignment = Arrangement.Center,
+                                    boxContentAlignment = Alignment.Center,
                                     contentPadding = PaddingValues(
                                         horizontal = 24.dp,
                                         vertical = 32.dp

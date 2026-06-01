@@ -78,6 +78,7 @@ val MEAL_LABELS = listOf(
     "drink"
 )
 
+
 fun decodeBitmap(
     path: String,
     reqWidth: Int = 300,
@@ -258,4 +259,8 @@ fun getCurrentWeekMillis() : Pair<Long, Long>{
     val startOfWeek = monday.atStartOfDayIn(timeZone).toEpochMilliseconds()
     val endOfWeek = sunday.atStartOfDayIn(timeZone).toEpochMilliseconds()
     return startOfWeek to endOfWeek
+}
+
+fun String.isNetworkUrl(): Boolean {
+    return startsWith("http://") || startsWith("https://")
 }

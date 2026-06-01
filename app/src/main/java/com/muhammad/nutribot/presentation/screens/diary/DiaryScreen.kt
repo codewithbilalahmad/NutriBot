@@ -53,6 +53,7 @@ import com.muhammad.nutribot.presentation.screens.diary.components.CaloriesInTak
 import com.muhammad.nutribot.presentation.screens.diary.components.DiaryTopbar
 import com.muhammad.nutribot.presentation.screens.diary.components.EmptyFoodSection
 import com.muhammad.nutribot.presentation.screens.diary.components.MealCard
+import com.muhammad.nutribot.presentation.screens.search_meal.components.SearchMealLoader
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -184,25 +185,39 @@ fun DiaryScreen(
                             )
                         )
                     }
-                    items(state.foods, key = { it.id }, contentType = {
-                        "meal_${it.id}"
-                    }) { meal ->
-                        MealCard(
-                            meal = meal,
-                            onMealClick = { meal ->
-                                navHostController.navigate(Destination.MealDetailScreen(meal))
-                            },
-                            onDeleteMeal = { meal ->
-                                viewModel.onAction(DiaryAction.OnSelectMeal(meal))
-                                viewModel.onAction(DiaryAction.OnToggleDeleteMealDialog)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .animateItem(),
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedVisibilityScope = animatedVisibilityScope
-                        )
+                    when{
+                        state.isLoadingFoods ->{
+                            items(10, key = {it}, contentType = {
+                                "loading_${it}"
+                            }){
+                                SearchMealLoader(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .animateItem())
+                            }
+                        }
+                        else ->{
+                            items(state.foods, key = { it.id }, contentType = {
+                                "meal_${it.id}"
+                            }) { meal ->
+                                MealCard(
+                                    meal = meal,
+                                    onMealClick = { meal ->
+                                        navHostController.navigate(Destination.MealDetailScreen(meal))
+                                    },
+                                    onDeleteMeal = { meal ->
+                                        viewModel.onAction(DiaryAction.OnSelectMeal(meal))
+                                        viewModel.onAction(DiaryAction.OnToggleDeleteMealDialog)
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .animateItem(),
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -279,10 +294,10 @@ fun DiaryScreen(
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),
                     label = R.string.food_database,
-                    icon = R.drawable.ic_diary,
+                    icon = R.drawable.ic_meal,
                     onClick = {
                         viewModel.onAction(DiaryAction.OnToggleAddFoodBottomSheet)
-
+                        navHostController.navigate(Destination.SearchMealScreen)
                     })
                 AddFoodOptionCard(
                     modifier = Modifier.weight(1f),

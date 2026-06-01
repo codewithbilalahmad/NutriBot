@@ -14,4 +14,5 @@ sealed interface MealDetailAction{
     data object OnSaveEditMealOption : MealDetailAction
     data object OnDismissEditMealDialog : MealDetailAction
     data object OnClearEditMealState : MealDetailAction
+    data class OnSelectMealImage(val uri : String) : MealDetailAction
 }

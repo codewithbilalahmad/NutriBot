@@ -135,4 +135,11 @@
     <string name="edit_fat_desp">Input data for one dish</string>
     <string name="edit_carbs_desp">Input data for one dish</string>
     <string name="edit_protein_desp">Input data for one dish</string>
+    <string name="search_meal">Search Meal</string>
+    <string name="recent_meals">Recent Meals</string>
+    <string name="no_meal_found_desp">We couldn\'t find any meals matching your search. Try a different name or check the spelling.</string>
+    <string name="no_meal_found">No Meal Found</string>
+    <string name="serving_size">Serving size</string>
+    <string name="my_dish">My Dish</string>
+    <string name="tap_to_upload_image">Tap to Upload Image</string>
 </resources>

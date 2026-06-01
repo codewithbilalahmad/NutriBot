@@ -1,5 +1,8 @@
 package com.muhammad.nutribot.presentation.screens.meal_details
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
@@ -10,6 +13,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,20 +57,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.EditMealOption
 import com.muhammad.nutribot.presentation.components.button.PrimaryButton
 import com.muhammad.nutribot.presentation.components.button.SecondaryButton
 import com.muhammad.nutribot.presentation.components.image.AppImage
+import com.muhammad.nutribot.presentation.components.image.ImagePlaceholder
 import com.muhammad.nutribot.presentation.components.textfield.AppTextField
 import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.meal_details.components.HeartLikeAnimation
@@ -76,6 +84,8 @@ import com.muhammad.nutribot.presentation.screens.meal_details.components.MealNu
 import com.muhammad.nutribot.presentation.screens.meal_details.components.NumberOfServingsSection
 import com.muhammad.nutribot.presentation.screens.meal_details.components.TotalCaloriesCard
 import com.muhammad.nutribot.utils.ObserveAsEvents
+import com.muhammad.nutribot.utils.isNetworkUrl
+import com.muhammad.nutribot.utils.loadingEffect
 import com.muhammad.nutribot.utils.rippleClickable
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -131,6 +141,12 @@ fun MealDetailScreen(
                 return date <= today
             }
         })
+    val galleryImagePicker =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                viewModel.onAction(MealDetailAction.OnSelectMealImage(uri.toString()))
+            }
+        }
     val scrollOffset by remember {
         derivedStateOf {
             listState.firstVisibleItemScrollOffset
@@ -139,15 +155,15 @@ fun MealDetailScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             MealDetailEvent.OnMealLoggedSuccess -> {
-                if(state.isAlreadyLogged){
-                    navHostController.navigate(Destination.DiaryScreen){
-                        popUpTo<Destination.MealDetailScreen>{
+                if (state.isAlreadyLogged) {
+                    navHostController.navigate(Destination.DiaryScreen) {
+                        popUpTo<Destination.MealDetailScreen> {
                             inclusive = true
                         }
                     }
-                } else{
-                    navHostController.navigate(Destination.StreakProgressScreen){
-                        popUpTo<Destination.MealDetailScreen>{
+                } else {
+                    navHostController.navigate(Destination.StreakProgressScreen) {
+                        popUpTo<Destination.MealDetailScreen> {
                             inclusive = true
                         }
                     }
@@ -164,7 +180,11 @@ fun MealDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
                 PrimaryButton(
-                    text = if(state.isAlreadyLogged) stringResource(R.string.done) else "${stringResource(R.string.log_to)} ${state.selectedDate.day} ${
+                    text = if (state.isAlreadyLogged) stringResource(R.string.done) else "${
+                        stringResource(
+                            R.string.log_to
+                        )
+                    } ${state.selectedDate.day} ${
                         state.selectedDate.month.name.lowercase()
                             .replaceFirstChar { it.uppercase() }
                     }",
@@ -186,33 +206,89 @@ fun MealDetailScreen(
                         end = paddingValues.calculateEndPadding(layoutDirection),
                         bottom = paddingValues.calculateBottomPadding()
                     )
-                )
+                ).clickable(interactionSource = remember { MutableInteractionSource() },indication = null){
+                    galleryImagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp), contentAlignment = Alignment.Center
+                    .height(350.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
             ) {
-                with(sharedTransitionScope) {
-                    AppImage(
-                        image = food.mealImageUrl,
+                if (food.mealImageUrl.isNotEmpty()) {
+                    with(sharedTransitionScope) {
+                        if (food.mealImageUrl.isNetworkUrl()) {
+                            AsyncImage(
+                                model = food.mealImageUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .graphicsLayer {
+                                        translationY = with(density) {
+                                            -scrollOffset.toFloat() * 0.5f
+                                        }
+                                    }
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    .loadingEffect()
+                                    .sharedElement(
+                                        sharedContentState = rememberSharedContentState(
+                                            key = "meal_image"
+                                        ),
+                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        boundsTransform = { _, _ ->
+                                            tween(durationMillis = 300, easing = LinearEasing)
+                                        }
+                                    ))
+                        } else {
+                            AppImage(
+                                image = food.mealImageUrl,
+                                modifier = Modifier
+                                    .graphicsLayer {
+                                        translationY = with(density) {
+                                            -scrollOffset.toFloat() * 0.5f
+                                        }
+                                    }
+                                    .fillMaxSize()
+                                    .sharedElement(
+                                        sharedContentState = rememberSharedContentState(
+                                            key = "meal_image"
+                                        ),
+                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        boundsTransform = { _, _ ->
+                                            tween(durationMillis = 300, easing = LinearEasing)
+                                        }
+                                    )
+                            )
+                        }
+                    }
+                } else {
+                    Column(
                         modifier = Modifier
+                            .fillMaxSize()
                             .graphicsLayer {
                                 translationY = with(density) {
                                     -scrollOffset.toFloat() * 0.5f
                                 }
-                            }
-                            .fillMaxSize()
-                            .sharedElement(
-                                sharedContentState = rememberSharedContentState(
-                                    key = "meal_image"
-                                ),
-                                animatedVisibilityScope = animatedVisibilityScope,
-                                boundsTransform = { _, _ ->
-                                    tween(durationMillis = 300, easing = LinearEasing)
-                                }
+                            },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        ImagePlaceholder()
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.tap_to_upload_image),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp),
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                color = MaterialTheme.colorScheme.surface,
+                                textAlign = TextAlign.Center
                             )
-                    )
+                        )
+                    }
                 }
                 HeartLikeAnimation(
                     showAnimation = showLikeAnimation,
@@ -471,7 +547,7 @@ fun MealDetailScreen(
                     contentDescription = null
                 )
             }
-            if(!state.isAlreadyLogged){
+            if (!state.isAlreadyLogged) {
                 MealDateCard(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -487,30 +563,70 @@ fun MealDetailScreen(
         AlertDialog(onDismissRequest = {
             viewModel.onAction(MealDetailAction.OnDismissEditMealDialog)
         }, title = {
-            val title = when(state.selectedEditMealOption){
+            val title = when (state.selectedEditMealOption) {
                 EditMealOption.NONE -> ""
-                EditMealOption.NAME -> { stringResource(R.string.edit_food_name_title) }
-                EditMealOption.CALORIES -> { stringResource(R.string.edit_calories_title) }
-                EditMealOption.FATS -> { stringResource(R.string.edit_fat_title) }
-                EditMealOption.CARBS -> { stringResource(R.string.edit_carbs_title) }
-                EditMealOption.PROTEIN -> { stringResource(R.string.edit_protein_title) }
+                EditMealOption.NAME -> {
+                    stringResource(R.string.edit_food_name_title)
+                }
+
+                EditMealOption.CALORIES -> {
+                    stringResource(R.string.edit_calories_title)
+                }
+
+                EditMealOption.FATS -> {
+                    stringResource(R.string.edit_fat_title)
+                }
+
+                EditMealOption.CARBS -> {
+                    stringResource(R.string.edit_carbs_title)
+                }
+
+                EditMealOption.PROTEIN -> {
+                    stringResource(R.string.edit_protein_title)
+                }
             }
-            val desp = when(state.selectedEditMealOption){
+            val desp = when (state.selectedEditMealOption) {
                 EditMealOption.NONE -> ""
-                EditMealOption.NAME -> { stringResource(R.string.edit_food_name_desp) }
-                EditMealOption.CALORIES -> { stringResource(R.string.edit_calories_desp) }
-                EditMealOption.FATS -> { stringResource(R.string.edit_fat_desp) }
-                EditMealOption.CARBS -> { stringResource(R.string.edit_carbs_desp) }
-                EditMealOption.PROTEIN -> { stringResource(R.string.edit_protein_desp) }
+                EditMealOption.NAME -> {
+                    stringResource(R.string.edit_food_name_desp)
+                }
+
+                EditMealOption.CALORIES -> {
+                    stringResource(R.string.edit_calories_desp)
+                }
+
+                EditMealOption.FATS -> {
+                    stringResource(R.string.edit_fat_desp)
+                }
+
+                EditMealOption.CARBS -> {
+                    stringResource(R.string.edit_carbs_desp)
+                }
+
+                EditMealOption.PROTEIN -> {
+                    stringResource(R.string.edit_protein_desp)
+                }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)){
-                Text(text = title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
-                Text(text = desp, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.surface))
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = desp,
+                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.surface)
+                )
             }
         }, containerColor = MaterialTheme.colorScheme.background, text = {
-            AppTextField(state = state.editMealState, modifier = Modifier.fillMaxWidth(), trailingIcon = R.drawable.ic_cancel_filled, onTrailingClick = {
-                viewModel.onAction(MealDetailAction.OnClearEditMealState)
-            }, textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light))
+            AppTextField(
+                state = state.editMealState,
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = R.drawable.ic_cancel_filled,
+                onTrailingClick = {
+                    viewModel.onAction(MealDetailAction.OnClearEditMealState)
+                },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Light)
+            )
         }, dismissButton = {
             SecondaryButton(text = stringResource(R.string.cancel), onClick = {
                 viewModel.onAction(MealDetailAction.OnDismissEditMealDialog)

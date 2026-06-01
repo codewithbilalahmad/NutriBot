@@ -37,13 +37,17 @@ fun NumberOfServingsSection(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = stringResource(R.string.number_of_servings),
+            text = stringResource(if (food.servingSize.isEmpty()) R.string.number_of_servings else R.string.serving_size),
             style = MaterialTheme.typography.bodyLarge
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(
+                text = food.servingSize,
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+            )
             Box(
                 modifier = Modifier
                     .size(35.dp)
@@ -56,7 +60,7 @@ fun NumberOfServingsSection(
                     )
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.background)
-                    .rippleClickable{
+                    .rippleClickable {
                         onMinusServings()
                     },
                 contentAlignment = Alignment.Center
@@ -83,7 +87,7 @@ fun NumberOfServingsSection(
                     )
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.background)
-                    .rippleClickable{
+                    .rippleClickable {
                         onAddServings()
                     },
                 contentAlignment = Alignment.Center

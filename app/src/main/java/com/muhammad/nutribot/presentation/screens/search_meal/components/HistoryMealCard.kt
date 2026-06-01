@@ -1,4 +1,4 @@
-package com.muhammad.nutribot.presentation.screens.diary.components
+package com.muhammad.nutribot.presentation.screens.search_meal.components
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,39 +37,37 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.muhammad.nutribot.R
-import com.muhammad.nutribot.domain.model.Food
+import com.muhammad.nutribot.domain.model.HistoryFood
 import com.muhammad.nutribot.presentation.components.image.AppImage
-import com.muhammad.nutribot.presentation.components.image.ImagePlaceholder
 import com.muhammad.nutribot.presentation.screens.meal_details.components.IngredientItem
 import com.muhammad.nutribot.presentation.theme.CarbsColor
 import com.muhammad.nutribot.presentation.theme.FatColor
 import com.muhammad.nutribot.presentation.theme.ProteinColor
-import com.muhammad.nutribot.utils.isNetworkUrl
 import com.muhammad.nutribot.utils.loadingEffect
-import com.muhammad.nutribot.utils.rippleClickable
 import com.muhammad.nutribot.utils.toFormattedTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @Composable
-fun MealCard(
+fun HistoryMealCard(
     modifier: Modifier = Modifier,
-    meal: Food,
+    meal: HistoryFood,
+    onMealClick: (HistoryFood) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope,
-    onMealClick: (Food) -> Unit,
-    onDeleteMeal: (Food) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val dateTime = remember(meal.eatenAt) {
-        Instant.fromEpochMilliseconds(meal.eatenAt).toLocalDateTime(TimeZone.currentSystemDefault())
+    val dateTime = remember(meal.createdAt) {
+        Instant.fromEpochMilliseconds(meal.createdAt).toLocalDateTime(TimeZone.currentSystemDefault())
     }
     Card(
-        modifier = modifier.dropShadow(shape = RoundedCornerShape(16.dp), shadow = Shadow(
-            radius = 2.dp,
-            spread = 2.dp,
-            color = MaterialTheme.colorScheme.surfaceContainerLow
-        )),
+        modifier = modifier.dropShadow(
+            shape = RoundedCornerShape(16.dp), shadow = Shadow(
+                radius = 2.dp,
+                spread = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceContainerLow
+            )
+        ),
         onClick = {
             onMealClick(meal)
         },
@@ -84,46 +81,27 @@ fun MealCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Box(modifier = Modifier.size(100.dp), contentAlignment = Alignment.CenterStart){
-                if(meal.mealImageUrl.isNotEmpty()){
-                    with(sharedTransitionScope){
-                        if(meal.mealImageUrl.isNetworkUrl()){
-                            AsyncImage(model = meal.mealImageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainer)
-                                .loadingEffect()
-                                .sharedElement(
-                                    sharedContentState = rememberSharedContentState(
-                                        key = "meal_image"
-                                    ),
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                    boundsTransform = { _, _ ->
-                                        tween(durationMillis = 300, easing = LinearEasing)
-                                    }
-                                ))
-                        } else{
-                            AppImage(
-                                image = meal.mealImageUrl,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .sharedElement(
-                                        sharedContentState = rememberSharedContentState(
-                                            key = "meal_image"
-                                        ),
-                                        animatedVisibilityScope = animatedVisibilityScope,
-                                        boundsTransform = { _, _ ->
-                                            tween(durationMillis = 300, easing = LinearEasing)
-                                        }
-                                    )
-                            )
-                        }
-                    }
-                } else{
-                    ImagePlaceholder(size= 60.dp, borderWidth = 2.5.dp)
-                }
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    model = meal.mealImageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .loadingEffect()
+                        .sharedElement(
+                            sharedContentState = rememberSharedContentState(
+                                key = "meal_image"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                tween(durationMillis = 300, easing = LinearEasing)
+                            }
+                        )
+                )
+
             }
             Column(modifier = Modifier.weight(1f)) {
                 Row(
@@ -153,15 +131,6 @@ fun MealCard(
                             maxLines = 2, overflow = TextOverflow.Ellipsis
                         )
                     }
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_delete),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .rippleClickable {
-                                onDeleteMeal(meal)
-                            })
                 }
                 Spacer(Modifier.height(4.dp))
                 Row(

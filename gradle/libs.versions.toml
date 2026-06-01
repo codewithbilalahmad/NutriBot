@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.2"
+coilCompose = "2.7.0"
 kotlin = "2.3.20"
 coreKtx = "1.18.0"
 composeBom = "2026.03.01"
@@ -28,6 +29,7 @@ profileinstaller = "1.4.1"
 ktor = "3.5.0"
 
 [libraries]
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
