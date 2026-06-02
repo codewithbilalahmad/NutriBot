@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.muhammad.nutribot.R
+import com.muhammad.nutribot.utils.rippleClickable
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -41,7 +42,7 @@ fun MealDateCard(modifier: Modifier = Modifier, selectedDate: LocalDate, onClick
         else -> "${selectedDate.day} ${selectedDate.month.name.lowercase().replaceFirstChar { it.uppercase() }}"
     }
     Card(
-        modifier = modifier, onClick = onClick,
+        modifier = modifier.rippleClickable(onClick = onClick),
         shape = CircleShape,
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)

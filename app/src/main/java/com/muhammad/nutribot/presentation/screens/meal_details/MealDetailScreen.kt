@@ -207,7 +207,7 @@ fun MealDetailScreen(
                         end = paddingValues.calculateEndPadding(layoutDirection),
                         bottom = paddingValues.calculateBottomPadding()
                     )
-                ).clickable(interactionSource = remember { MutableInteractionSource() },indication = null){
+                ).clickable(interactionSource = remember { MutableInteractionSource() },indication = null, enabled = food.mealImageUrl.isEmpty()){
                     galleryImagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 }
         ) {

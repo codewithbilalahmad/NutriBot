@@ -25,11 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Food
 import com.muhammad.nutribot.presentation.components.image.AppImage
@@ -37,6 +39,7 @@ import com.muhammad.nutribot.presentation.screens.meal_details.components.Ingred
 import com.muhammad.nutribot.presentation.theme.CarbsColor
 import com.muhammad.nutribot.presentation.theme.FatColor
 import com.muhammad.nutribot.presentation.theme.ProteinColor
+import com.muhammad.nutribot.utils.isNetworkUrl
 import com.muhammad.nutribot.utils.rippleClickable
 import com.muhammad.nutribot.utils.toFormattedTime
 import kotlinx.datetime.TimeZone
@@ -55,8 +58,7 @@ fun FavouriteMealCard(
     }
     Box(modifier = modifier) {
         Card(
-            modifier = modifier,
-            onClick = {
+            modifier = modifier.rippleClickable{
                 onClick(meal)
             },
             shape = RoundedCornerShape(16.dp),
@@ -70,17 +72,29 @@ fun FavouriteMealCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                AppImage(
-                    image = meal.mealImageUrl,
-                    modifier = Modifier
+                if(meal.mealImageUrl.isNetworkUrl()){
+                    AsyncImage(model = meal.mealImageUrl, contentDescription = null, modifier = Modifier
                         .size(width = 110.dp, height = 130.dp)
                         .clip(
                             RoundedCornerShape(
                                 topStart = 16.dp,
                                 bottomStart = 16.dp
                             )
-                        )
-                )
+                        ), contentScale = ContentScale.Crop
+                    )
+                } else{
+                    AppImage(
+                        image = meal.mealImageUrl,
+                        modifier = Modifier
+                            .size(width = 110.dp, height = 130.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 16.dp,
+                                    bottomStart = 16.dp
+                                )
+                            )
+                    )
+                }
                 Column(modifier = Modifier.weight(1f)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),

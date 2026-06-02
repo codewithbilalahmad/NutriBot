@@ -31,6 +31,7 @@ import com.muhammad.nutribot.presentation.screens.diary.DiaryViewModel
 import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMealsViewModel
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailViewModel
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupViewModel
+import com.muhammad.nutribot.presentation.screens.progress.ProgressViewModel
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealViewModel
 import com.muhammad.nutribot.presentation.screens.search_meal.SearchMealViewModel
 import com.muhammad.nutribot.presentation.screens.setting.SettingViewModel
@@ -80,4 +81,5 @@ val appModule = module {
     viewModelOf(::StreakProgressViewModel)
     viewModelOf(::FavouriteMealsViewModel)
     viewModelOf(::SearchMealViewModel)
+    viewModelOf(::ProgressViewModel)
 }

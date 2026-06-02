@@ -40,6 +40,7 @@ import com.muhammad.nutribot.presentation.theme.CarbsColor
 import com.muhammad.nutribot.presentation.theme.FatColor
 import com.muhammad.nutribot.presentation.theme.ProteinColor
 import com.muhammad.nutribot.utils.loadingEffect
+import com.muhammad.nutribot.utils.rippleClickable
 
 @Composable
 fun SearchMealCard(
@@ -50,16 +51,15 @@ fun SearchMealCard(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     Card(
-        modifier = modifier.dropShadow(
+        modifier = modifier.rippleClickable{
+            onMealClick(meal)
+        }.dropShadow(
             shape = RoundedCornerShape(16.dp), shadow = Shadow(
                 radius = 2.dp,
                 spread = 2.dp,
                 color = MaterialTheme.colorScheme.surfaceContainerLow
             )
         ),
-        onClick = {
-            onMealClick(meal)
-        },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {

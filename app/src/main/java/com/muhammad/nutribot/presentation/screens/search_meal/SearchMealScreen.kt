@@ -195,7 +195,7 @@ fun SearchMealScreen(
                                     .padding(top = 12.dp, start = 16.dp, end = 16.dp)
                                     .animateItem(),
                                 onMealClick = {
-                                    navHostController.navigate(Destination.MealDetailScreen(historyFood.toFood()))
+                                    navHostController.navigate(Destination.MealDetailScreen(historyFood.copy(createdAt = 0L).toFood()))
                                 },
                                 sharedTransitionScope = sharedTransitionScope,
                                 animatedVisibilityScope = animatedVisibilityScope

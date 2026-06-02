@@ -66,14 +66,13 @@ fun MealCard(
         Instant.fromEpochMilliseconds(meal.eatenAt).toLocalDateTime(TimeZone.currentSystemDefault())
     }
     Card(
-        modifier = modifier.dropShadow(shape = RoundedCornerShape(16.dp), shadow = Shadow(
+        modifier = modifier.rippleClickable{
+            onMealClick(meal)
+        }.dropShadow(shape = RoundedCornerShape(16.dp), shadow = Shadow(
             radius = 2.dp,
             spread = 2.dp,
             color = MaterialTheme.colorScheme.surfaceContainerLow
         )),
-        onClick = {
-            onMealClick(meal)
-        },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {

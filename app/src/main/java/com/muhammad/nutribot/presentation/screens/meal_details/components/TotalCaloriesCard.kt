@@ -24,18 +24,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Food
+import com.muhammad.nutribot.utils.rippleClickable
 
 @Composable
 fun TotalCaloriesCard(modifier: Modifier = Modifier, food: Food,onClick : () -> Unit) {
     Card(
-        modifier = modifier.dropShadow(
+        modifier = modifier.rippleClickable(onClick = onClick).dropShadow(
             shape = RoundedCornerShape(16.dp),
             shadow = Shadow(
                 radius = 2.dp,
                 spread = 2.dp,
                 color = MaterialTheme.colorScheme.surfaceContainerLow
             )
-        ), onClick = onClick,
+        ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {

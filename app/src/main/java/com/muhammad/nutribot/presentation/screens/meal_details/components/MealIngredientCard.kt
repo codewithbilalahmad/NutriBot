@@ -28,18 +28,19 @@ import com.muhammad.nutribot.presentation.components.checkbox.AppCheckBox
 import com.muhammad.nutribot.presentation.theme.CarbsColor
 import com.muhammad.nutribot.presentation.theme.FatColor
 import com.muhammad.nutribot.presentation.theme.ProteinColor
+import com.muhammad.nutribot.utils.rippleClickable
 
 @Composable
 fun MealIngredientCard(modifier: Modifier = Modifier, ingredient: Ingredient, onClick: () -> Unit) {
     Card(
-        modifier = modifier.dropShadow(
+        modifier = modifier.rippleClickable(onClick = onClick).dropShadow(
             shape = RoundedCornerShape(16.dp),
             shadow = Shadow(
                 radius = 2.dp,
                 spread = 2.dp,
                 color = MaterialTheme.colorScheme.surfaceContainerLow
             )
-        ), onClick = onClick,
+        ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
     ) {
