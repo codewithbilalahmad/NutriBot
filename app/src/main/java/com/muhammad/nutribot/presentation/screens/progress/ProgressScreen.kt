@@ -1,6 +1,8 @@
 package com.muhammad.nutribot.presentation.screens.progress
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,5 +22,7 @@ fun ProgressScreen(
         ProgressTopbar(streak = state.streak, onStreakClick = {
             navHostController.navigate(Destination.StreakScreen)
         }, onSettingClick = {})
-    }){  pading}
+    }){  paddingValues ->
+        LazyColumn(modifier = Modifier.fillMaxSize()){  }
+    }
 }
