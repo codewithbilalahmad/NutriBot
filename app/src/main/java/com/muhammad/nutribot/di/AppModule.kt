@@ -1,14 +1,15 @@
 package com.muhammad.nutribot.di
 
 import android.content.Context
-import androidx.lifecycle.SavedStateHandle
 import androidx.room.Room
 import com.muhammad.nutribot.NutriBotApplication
 import com.muhammad.nutribot.data.local.NutriBotDatabase
 import com.muhammad.nutribot.data.reminders.MealReminderSchedulerImp
+import com.muhammad.nutribot.data.remote.network.BarcodeMealNetworkImp
 import com.muhammad.nutribot.data.remote.network.SearchFoodNetworkImp
 import com.muhammad.nutribot.data.remote.network.network.HttpClientFactory
-import com.muhammad.nutribot.data.remote.repository.SearchFoodRespositoryImp
+import com.muhammad.nutribot.data.remote.repository.barcode_meal.BarcodeMealRepositoryImp
+import com.muhammad.nutribot.data.remote.repository.search_food.SearchFoodRespositoryImp
 import com.muhammad.nutribot.data.repository.camera.CameraControllerImp
 import com.muhammad.nutribot.data.repository.connection.AndroidConnectivityObserver
 import com.muhammad.nutribot.data.repository.food.FoodRepositoryImp
@@ -16,7 +17,9 @@ import com.muhammad.nutribot.data.repository.food_history.FoodHistoryRespository
 import com.muhammad.nutribot.data.repository.ingredient.IngredientRepositoryImp
 import com.muhammad.nutribot.data.repository.nutrition_calculation.NutritionCalculationRepositoryImp
 import com.muhammad.nutribot.data.repository.settings.SettingRepositoryImp
+import com.muhammad.nutribot.domain.network.BarcodeMealNetwork
 import com.muhammad.nutribot.domain.network.SearchFoodNetwork
+import com.muhammad.nutribot.domain.repository.barcode_meal.BarcodeMealRepository
 import com.muhammad.nutribot.domain.repository.camera.CameraController
 import com.muhammad.nutribot.domain.repository.connection.ConnectivityObserver
 import com.muhammad.nutribot.domain.repository.food.FoodRepository
@@ -40,7 +43,6 @@ import com.muhammad.nutribot.presentation.screens.streak_progress.StreakProgress
 import com.muhammad.nutribot.utils.Constants.DATABASE_NAME
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -65,12 +67,14 @@ val appModule = module {
         get<NutriBotDatabase>().historyFoodDao()
     }
     singleOf(::SearchFoodNetworkImp).bind<SearchFoodNetwork>()
+    singleOf(::BarcodeMealNetworkImp).bind<BarcodeMealNetwork>()
     singleOf(::FoodRepositoryImp).bind<FoodRepository>()
     singleOf(::FoodHistoryRespositoryImp).bind<FoodHistoryRespository>()
     singleOf(::IngredientRepositoryImp).bind<IngredientRepository>()
     singleOf(::SettingRepositoryImp).bind<SettingRepository>()
     singleOf(::NutritionCalculationRepositoryImp).bind<NutritionCalculationRepository>()
     singleOf(::SearchFoodRespositoryImp).bind<SearchFoodRespository>()
+    singleOf(::BarcodeMealRepositoryImp).bind<BarcodeMealRepository>()
     viewModelOf(::MainViewModel)
     viewModelOf(::NutritionSetupViewModel)
     viewModelOf(::DiaryViewModel)

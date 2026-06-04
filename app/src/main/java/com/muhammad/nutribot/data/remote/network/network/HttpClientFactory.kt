@@ -1,6 +1,5 @@
 package com.muhammad.nutribot.data.remote.network.network
 
-import com.muhammad.nutribot.utils.Constants.FOOD_SEARCH_BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.DefaultRequest
@@ -32,7 +31,6 @@ object HttpClientFactory{
                 }
             }
             install(DefaultRequest){
-                url(FOOD_SEARCH_BASE_URL)
                 contentType(ContentType.Application.Json)
             }
         }

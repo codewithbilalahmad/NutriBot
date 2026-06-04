@@ -35,6 +35,11 @@ android {
         )
         buildConfigField(
             "String",
+            "BARCODE_MEAL_BASE_URL",
+            "\"${project.findProperty("BARCODE_MEAL_BASE_URL")}\""
+        )
+        buildConfigField(
+            "String",
             "FOOD_SEARCH_API_KEY",
             "\"${project.findProperty("FOOD_SEARCH_API_KEY")}\""
         )
@@ -92,6 +97,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.coil.compose)
+    implementation(libs.mlkit.barcode)
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

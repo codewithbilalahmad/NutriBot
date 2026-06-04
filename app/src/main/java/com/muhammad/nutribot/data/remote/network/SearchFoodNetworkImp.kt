@@ -4,6 +4,7 @@ import com.muhammad.nutribot.data.remote.dto.food_search.FoodSearchResponse
 import com.muhammad.nutribot.data.remote.network.network.get
 import com.muhammad.nutribot.domain.network.SearchFoodNetwork
 import com.muhammad.nutribot.utils.Constants.FOOD_SEARCH_API_KEY
+import com.muhammad.nutribot.utils.Constants.FOOD_SEARCH_BASE_URL
 import com.muhammad.nutribot.utils.Result
 import io.ktor.client.HttpClient
 
@@ -12,7 +13,7 @@ class SearchFoodNetworkImp(
 ) : SearchFoodNetwork {
     override suspend fun searchFoods(query: String): Result<FoodSearchResponse> {
         return httpClient.get<FoodSearchResponse>(
-            route = "recipes/complexSearch", queryParameters = mapOf(
+            route = "${FOOD_SEARCH_BASE_URL}recipes/complexSearch", queryParameters = mapOf(
                 "query" to query,
                 "number" to 15,
                 "fillIngredients" to true,

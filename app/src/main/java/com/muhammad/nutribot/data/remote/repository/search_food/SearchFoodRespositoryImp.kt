@@ -1,4 +1,4 @@
-package com.muhammad.nutribot.data.remote.repository
+package com.muhammad.nutribot.data.remote.repository.search_food
 
 import com.muhammad.nutribot.data.remote.mapper.toFood
 import com.muhammad.nutribot.domain.model.Food
@@ -8,7 +8,7 @@ import com.muhammad.nutribot.utils.Result
 
 class SearchFoodRespositoryImp(
     private val searchFoodNetwork: SearchFoodNetwork
-) : SearchFoodRespository{
+) : SearchFoodRespository {
     override suspend fun searchFoods(query: String): Result<List<Food>> {
         val response =  searchFoodNetwork.searchFoods(query)
         return when(response){

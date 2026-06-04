@@ -27,8 +27,10 @@ benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
 profileinstaller = "1.4.1"
 ktor = "3.5.0"
+mlkitBarcode = "17.3.0"
 
 [libraries]
+mlkit-barcode = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkitBarcode" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }

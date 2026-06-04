@@ -21,6 +21,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.muhammad.nutribot.domain.model.ScanOption
 import com.muhammad.nutribot.domain.repository.camera.CameraController
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
@@ -44,6 +45,7 @@ class CameraControllerImp(
 
     private val cameraExecutor = Executors.newSingleThreadExecutor()
     private lateinit var mealAnalyzer: MealDetectionAnalyzer
+    private lateinit var mealBarcodeAnalyzer: MealBarcodeAnalyzer
 
     override val previewView = PreviewView(context).apply {
         implementationMode = PreviewView.ImplementationMode.PERFORMANCE
@@ -52,6 +54,8 @@ class CameraControllerImp(
 
     override fun startCamera(
         lifecycleOwner: LifecycleOwner,
+        scanOption: ScanOption,
+        onBarcodeDetected: (String) -> Unit,
         onCameraBinding: () -> Unit,
         onCameraBindSuccess: () -> Unit,
         onMealDetected: (Boolean) -> Unit,
@@ -69,7 +73,7 @@ class CameraControllerImp(
 
             cameraProvider = cameraProviderFuture.get()
 
-            bindUseCases(onMealDetected)
+            bindUseCases(scanOption = scanOption, onMealDetected = onMealDetected, onBarcodeDetected = onBarcodeDetected)
 
             previewView.previewStreamState.observe(lifecycleOwner) { state ->
 
@@ -107,11 +111,6 @@ class CameraControllerImp(
 
         imageCapture.takePicture(
 
-            /**
-             * IMPORTANT:
-             * run on background thread
-             * NOT main thread
-             */
             cameraExecutor,
 
             object : ImageCapture.OnImageCapturedCallback() {
@@ -133,10 +132,6 @@ class CameraControllerImp(
                     } finally {
 
                         image.close()
-
-                        /**
-                         * Resume analyzer
-                         */
                         if (::mealAnalyzer.isInitialized) {
                             mealAnalyzer.isPaused = false
                         }
@@ -157,10 +152,6 @@ class CameraControllerImp(
         )
     }
 
-    // -------------------------------------------------------------------------
-    // TOGGLE FLASH
-    // -------------------------------------------------------------------------
-
     override fun toggleFlash() {
 
         isFlashOn = !isFlashOn
@@ -168,12 +159,10 @@ class CameraControllerImp(
         camera?.cameraControl?.enableTorch(isFlashOn)
     }
 
-    // -------------------------------------------------------------------------
-    // BIND USE CASES
-    // -------------------------------------------------------------------------
-
     private fun bindUseCases(
+        scanOption: ScanOption,
         onMealDetected: (Boolean) -> Unit,
+        onBarcodeDetected: (String) -> Unit
     ) {
 
         val provider = cameraProvider ?: return
@@ -183,31 +172,16 @@ class CameraControllerImp(
 
         val selector = CameraSelector.DEFAULT_BACK_CAMERA
 
-        // ---------------------------------------------------------------------
-        // PREVIEW
-        // ---------------------------------------------------------------------
-
         preview = Preview.Builder()
             .build()
 
         preview.surfaceProvider = previewView.surfaceProvider
 
-        // ---------------------------------------------------------------------
-        // IMAGE CAPTURE
-        // ---------------------------------------------------------------------
-
         imageCapture = ImageCapture.Builder()
 
-            /**
-             * Faster capture
-             */
             .setCaptureMode(
                 ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
             )
-
-            /**
-             * Smaller JPEG
-             */
             .setJpegQuality(70)
 
             .setFlashMode(
@@ -223,6 +197,9 @@ class CameraControllerImp(
         mealAnalyzer = MealDetectionAnalyzer(
             onMealDetected = onMealDetected
         )
+        mealBarcodeAnalyzer = MealBarcodeAnalyzer(
+            onBarcodeDetected = onBarcodeDetected
+        )
 
         val imageAnalysis = ImageAnalysis.Builder()
             .setBackpressureStrategy(
@@ -235,10 +212,20 @@ class CameraControllerImp(
             .build()
 
             .apply {
-                setAnalyzer(
-                    cameraExecutor,
-                    mealAnalyzer
-                )
+                when(scanOption){
+                    ScanOption.BARCODE -> {
+                        setAnalyzer(
+                            cameraExecutor,
+                            mealBarcodeAnalyzer
+                        )
+                    }
+                    ScanOption.MEAL -> {
+                        setAnalyzer(
+                            cameraExecutor,
+                            mealAnalyzer
+                        )
+                    }
+                }
             }
 
         val useCaseGroup = UseCaseGroup.Builder()

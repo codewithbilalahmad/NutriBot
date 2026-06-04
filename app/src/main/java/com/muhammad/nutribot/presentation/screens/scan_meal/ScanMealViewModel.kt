@@ -101,7 +101,7 @@ class ScanMealViewModel(
                 _state.update {
                     it.copy(mealDetected = mealDetected)
                 }
-            }
+            }, scanOption = state.value.scanOption, onBarcodeDetected = {}
         )
     }
 
@@ -264,7 +264,7 @@ OUTPUT RULES:
                         _state.update {
                             it.copy(mealDetected = mealDetected)
                         }
-                    })
+                    }, scanOption = state.value.scanOption, onBarcodeDetected = {})
                 _snackbarEvents.trySend(
                     SnackbarEvent.ShowSnackbar(
                         message = context.getString(R.string.error_analyzing_meal),
