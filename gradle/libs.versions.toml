@@ -26,7 +26,7 @@ uiautomator = "2.3.0"
 benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
 profileinstaller = "1.4.1"
-ktor = "3.5.0"
+ktor = "2.3.12"
 mlkitBarcode = "17.3.0"
 
 [libraries]

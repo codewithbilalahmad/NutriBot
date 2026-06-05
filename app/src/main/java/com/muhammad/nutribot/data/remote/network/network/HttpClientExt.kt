@@ -10,7 +10,7 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.CancellationException
-import kotlinx.io.IOException
+import io.ktor.utils.io.errors.IOException
 import kotlinx.serialization.SerializationException
 import java.net.ConnectException
 import java.net.UnknownHostException

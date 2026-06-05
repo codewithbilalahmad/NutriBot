@@ -142,4 +142,8 @@
     <string name="serving_size">Serving size</string>
     <string name="my_dish">My Dish</string>
     <string name="tap_to_upload_image">Tap to Upload Image</string>
+    <string name="enter_barcode_number">Enter Barcode Number</string>
+    <string name="type_barcode_number">Type barcode number</string>
+    <string name="barcode_hint">8901234567890</string>
+    <string name="no_barcode_detected">No Barcoded detected</string>
 </resources>

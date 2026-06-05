@@ -10,7 +10,7 @@ interface CameraController {
     fun startCamera(
         lifecycleOwner: LifecycleOwner,
         scanOption: ScanOption,
-        onBarcodeDetected: (String) -> Unit,
+        onBarcodeDetected: (String, Bitmap) -> Unit,
         onCameraBinding: () -> Unit,
         onCameraBindSuccess: () -> Unit,
         onMealDetected: (Boolean) -> Unit,
@@ -18,4 +18,5 @@ interface CameraController {
     fun stopCamera()
     fun capturePhoto(onPhotoCaptured: (Bitmap) -> Unit)
     fun toggleFlash()
+    fun resetBarcodeAnalyzer()
 }

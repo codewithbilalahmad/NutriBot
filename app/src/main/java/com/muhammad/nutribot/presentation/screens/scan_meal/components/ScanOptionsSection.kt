@@ -46,7 +46,7 @@ fun ScanOptionsSection(
     LazyRow(
         modifier = modifier
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.background.copy(0.2f))
+            .background(MaterialTheme.colorScheme.background.copy(0.4f))
             .padding(4.dp),
         state = listState,
         userScrollEnabled = false
@@ -54,7 +54,7 @@ fun ScanOptionsSection(
         items(list, key = { it.name }, contentType = { it.name }) { option ->
             val isSelected = option == selectedOption
             val containerColor by animateColorAsState(
-                targetValue = if (isSelected) MaterialTheme.colorScheme.background.copy(0.5f)  else Color.Transparent,
+                targetValue = if (isSelected) MaterialTheme.colorScheme.background.copy(0.8f)  else Color.Transparent,
                 animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
                 label = "alpha"
             )

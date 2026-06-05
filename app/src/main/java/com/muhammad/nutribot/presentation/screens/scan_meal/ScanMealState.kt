@@ -1,6 +1,7 @@
 package com.muhammad.nutribot.presentation.screens.scan_meal
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.text.input.TextFieldState
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.ScanOption
 
@@ -19,7 +20,9 @@ data class ScanMealState(
     val analyzingMealStepIndex : Int = 0,
     val showCameraPermissionPermanentlyDeniedDialog : Boolean = false,
     val isAnalyzingMeal : Boolean = false,
-    val scanOption: ScanOption = ScanOption.MEAL
+    val scanOption: ScanOption = ScanOption.MEAL,
+    val showBarcodeNumberSection : Boolean = false,
+    val barcodeNumber : TextFieldState = TextFieldState()
 ){
     val currentAnalyzingMealStep = analyzingMealSteps[analyzingMealStepIndex]
 }

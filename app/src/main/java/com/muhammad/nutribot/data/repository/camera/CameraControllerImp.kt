@@ -55,7 +55,7 @@ class CameraControllerImp(
     override fun startCamera(
         lifecycleOwner: LifecycleOwner,
         scanOption: ScanOption,
-        onBarcodeDetected: (String) -> Unit,
+        onBarcodeDetected: (String, Bitmap) -> Unit,
         onCameraBinding: () -> Unit,
         onCameraBindSuccess: () -> Unit,
         onMealDetected: (Boolean) -> Unit,
@@ -159,10 +159,16 @@ class CameraControllerImp(
         camera?.cameraControl?.enableTorch(isFlashOn)
     }
 
+    override fun resetBarcodeAnalyzer() {
+        if(::mealBarcodeAnalyzer.isInitialized){
+            mealBarcodeAnalyzer.reset()
+        }
+    }
+
     private fun bindUseCases(
         scanOption: ScanOption,
         onMealDetected: (Boolean) -> Unit,
-        onBarcodeDetected: (String) -> Unit
+        onBarcodeDetected: (String, Bitmap) -> Unit
     ) {
 
         val provider = cameraProvider ?: return

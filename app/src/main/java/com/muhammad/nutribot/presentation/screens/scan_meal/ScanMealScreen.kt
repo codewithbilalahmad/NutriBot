@@ -11,6 +11,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,8 +67,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.GradientSnackbarVisuals
+import com.muhammad.nutribot.domain.model.ScanOption
+import com.muhammad.nutribot.presentation.components.image.ImagePlaceholder
 import com.muhammad.nutribot.presentation.components.snakbar.GradientSnackbarHost
 import com.muhammad.nutribot.presentation.navigation.Destination
+import com.muhammad.nutribot.presentation.screens.scan_meal.components.BarcodeNumberSection
 import com.muhammad.nutribot.presentation.screens.scan_meal.components.CameraPermissionCard
 import com.muhammad.nutribot.presentation.screens.scan_meal.components.CameraPreview
 import com.muhammad.nutribot.presentation.screens.scan_meal.components.MealCorneredBox
@@ -104,7 +108,24 @@ fun ScanMealScreen(
     val photoPickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
-                viewModel.onAction(ScanMealAction.OnPickMealGalleryImage(uri = uri.toString(), lifecycleOwner = lifeCycleOwner))
+                when(state.scanOption){
+                    ScanOption.MEAL -> {
+                        viewModel.onAction(
+                            ScanMealAction.OnPickMealGalleryImage(
+                                uri = uri.toString(),
+                                lifecycleOwner = lifeCycleOwner
+                            )
+                        )
+                    }
+                    ScanOption.BARCODE -> {
+                        viewModel.onAction(
+                            ScanMealAction.OnPickBarcodeGalleryImage(
+                                uri = uri.toString(),
+                                lifecycleOwner = lifeCycleOwner
+                            )
+                        )
+                    }
+                }
             }
         }
     val cameraPermissionLauncher =
@@ -122,8 +143,12 @@ fun ScanMealScreen(
     DisposableEffect(Unit) {
         onDispose {
             val window = activity.window
-            WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDarkTheme
-            WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = !isDarkTheme
+            WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars =
+                !isDarkTheme
+            WindowCompat.getInsetsController(
+                window,
+                window.decorView
+            ).isAppearanceLightNavigationBars = !isDarkTheme
         }
     }
     ObserveAsEvents(viewModel.events) { event ->
@@ -170,87 +195,113 @@ fun ScanMealScreen(
         }
     }
     NutriBotTheme(darkTheme = true) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(), snackbarHost = {
-                GradientSnackbarHost(snackbarHostState = snackbarHostState)
-            }, topBar = {
-                if (!state.isAnalyzingMeal) {
-                    TopAppBar(
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    navHostController.navigateUp()
-                                },
-                                shapes = IconButtonDefaults.shapes(),
-                                modifier = Modifier.padding(start = 8.dp),
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    containerColor = if (cameraPermissionGranted) MaterialTheme.colorScheme.background.copy(
-                                        0.2f
-                                    ) else MaterialTheme.colorScheme.surfaceContainer
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                        title = {},
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-                    )
-                }
-            }, bottomBar = {
-                if (!state.isAnalyzingMeal) {
-                    ScanMealBottomBar(
-                        isFlashOn = state.isFlashOn,
-                        isCaptureButtonEnabled = cameraPermissionGranted && state.mealDetected,
-                        enabled = cameraPermissionGranted,
-                        onCaptureMealPhoto = {
-                            if (isInternetConnected) {
-                                viewModel.onAction(ScanMealAction.OnCaptureMealPhoto(lifecycleOwner = lifeCycleOwner))
-                            } else {
-                                viewModel.onAction(ScanMealAction.OnNotifyNoInternetConnection)
-                            }
-                        },
-                        onPickMealGalleryImage = {
-                            if (isInternetConnected) {
-                                photoPickerLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(), snackbarHost = {
+                    GradientSnackbarHost(snackbarHostState = snackbarHostState)
+                }, topBar = {
+                    if (!state.isAnalyzingMeal) {
+                        TopAppBar(
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        navHostController.navigateUp()
+                                    },
+                                    shapes = IconButtonDefaults.shapes(),
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        containerColor = if (cameraPermissionGranted) MaterialTheme.colorScheme.background.copy(
+                                            0.2f
+                                        ) else MaterialTheme.colorScheme.surfaceContainer
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
+                                        contentDescription = null
+                                    )
+                                }
+                            },
+                            title = {},
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                        )
+                    }
+                }, bottomBar = {
+                    if (!state.isAnalyzingMeal) {
+                        ScanMealBottomBar(
+                            isFlashOn = state.isFlashOn,
+                            isCaptureButtonEnabled = cameraPermissionGranted && state.mealDetected,
+                            enabled = cameraPermissionGranted,
+                            onCaptureMealPhoto = {
+                                if (isInternetConnected) {
+                                    viewModel.onAction(
+                                        ScanMealAction.OnCaptureMealPhoto(
+                                            lifecycleOwner = lifeCycleOwner
+                                        )
+                                    )
+                                } else {
+                                    viewModel.onAction(ScanMealAction.OnNotifyNoInternetConnection)
+                                }
+                            },
+                            onPickMealGalleryImage = {
+                                if (isInternetConnected) {
+                                    photoPickerLauncher.launch(
+                                        PickVisualMediaRequest(
+                                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                                        )
+                                    )
+                                } else {
+                                    viewModel.onAction(ScanMealAction.OnNotifyNoInternetConnection)
+                                }
+                            },
+                            onToggleFlash = {
+                                viewModel.onAction(ScanMealAction.OnToggleFlash)
+                            },
+                            selectedScanOption = state.scanOption,
+                            onSelectScanOption = { scanOption ->
+                                viewModel.onAction(
+                                    ScanMealAction.OnScanMealOptionChange(
+                                        lifecycleOwner = lifeCycleOwner,
+                                        scanOption = scanOption
                                     )
                                 )
-                            } else {
-                                viewModel.onAction(ScanMealAction.OnNotifyNoInternetConnection)
-                            }
-                        },
-                        onToggleFlash = {
-                            viewModel.onAction(ScanMealAction.OnToggleFlash)
-                        },
-                        selectedScanOption = state.scanOption,
-                        onSelectScanOption = { scanOption ->
-                            viewModel.onAction(ScanMealAction.OnScanMealOptionChange(scanOption))
-                        })
+                            }, scanOption = state.scanOption, onToggleBarcodeNumberSection = {
+                                viewModel.onAction(ScanMealAction.OnToggleBarcodeNumberSection)
+                            })
+                    }
                 }
-            }
-        ) { paddingValues ->
-            if (cameraPermissionGranted) {
-                if (state.isAnalyzingMeal) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        state.mealBitmap?.let { bitmap ->
-                            with(sharedTransitionScope) {
-                                Image(
-                                    bitmap = bitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .sharedElement(
-                                            sharedContentState = rememberSharedContentState(key = "meal_image"),
-                                            animatedVisibilityScope = animatedVisibilityScope,
-                                            boundsTransform = { _, _ ->
-                                                tween(durationMillis = 300, easing = LinearEasing)
-                                            }
-                                        ),
-                                    contentScale = ContentScale.Crop
+            ) { paddingValues ->
+                if (cameraPermissionGranted) {
+                    if (state.isAnalyzingMeal) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surfaceContainer),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (state.mealBitmap != null) {
+                                with(sharedTransitionScope) {
+                                    Image(
+                                        bitmap = state.mealBitmap!!.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .sharedElement(
+                                                sharedContentState = rememberSharedContentState(key = "meal_image"),
+                                                animatedVisibilityScope = animatedVisibilityScope,
+                                                boundsTransform = { _, _ ->
+                                                    tween(
+                                                        durationMillis = 300,
+                                                        easing = LinearEasing
+                                                    )
+                                                }
+                                            ),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            } else {
+                                ImagePlaceholder(
+                                    size = configuration.screenWidthDp.dp * 1f,
+                                    borderWidth = 20.dp
                                 )
                             }
                             MealCorneredBox(
@@ -279,76 +330,96 @@ fun ScanMealScreen(
                                 )
                             }
                         }
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(
-                                start = paddingValues.calculateLeftPadding(layoutDirection),
-                                end = paddingValues.calculateEndPadding(layoutDirection)
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    start = paddingValues.calculateLeftPadding(layoutDirection),
+                                    end = paddingValues.calculateEndPadding(layoutDirection)
+                                )
+                        ) {
+                            CameraPreview(
+                                modifier = Modifier.fillMaxSize(),
+                                previewView = controller.previewView
                             )
-                    ) {
-                        CameraPreview(
-                            modifier = Modifier.fillMaxSize(), previewView = controller.previewView
-                        )
-                        if (state.isCameraLoading) {
-                            LoadingIndicator(
-                                color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        } else {
-                            MealCorneredBox(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(configuration.screenHeightDp.dp * 0.4f)
-                                    .padding(horizontal = 24.dp)
-                                    .align(Alignment.Center), isAnalyzingMeal = false, isMealDetected = state.mealDetected
-                            )
+                            if (state.isCameraLoading) {
+                                LoadingIndicator(
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            } else {
+                                MealCorneredBox(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(configuration.screenHeightDp.dp * 0.4f)
+                                        .padding(horizontal = 24.dp)
+                                        .align(Alignment.Center),
+                                    isAnalyzingMeal = false,
+                                    isMealDetected = state.mealDetected
+                                )
+                            }
                         }
                     }
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.camera_photo),
-                        contentDescription = null,
-                        modifier = Modifier.size(180.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.allow_app_to_access_your_camera),
+                } else {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth(0.80f),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.camera_photo),
+                            contentDescription = null,
+                            modifier = Modifier.size(180.dp)
                         )
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    Text(
-                        text = stringResource(R.string.allow_app_to_access_your_camera_desp),
-                        modifier = Modifier.fillMaxWidth(0.85f),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.surface,
-                            textAlign = TextAlign.Center
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.allow_app_to_access_your_camera),
+                            modifier = Modifier
+                                .fillMaxWidth(0.80f),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                textAlign = TextAlign.Center, fontWeight = FontWeight.Bold
+                            )
                         )
-                    )
-                    Spacer(Modifier.height(30.dp))
-                    CameraPermissionCard(
-                        cameraPermissionGranted = cameraPermissionGranted,
-                        modifier = Modifier.fillMaxWidth(0.9f),
-                        onRequestCameraPermission = {
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        })
+                        Spacer(Modifier.height(20.dp))
+                        Text(
+                            text = stringResource(R.string.allow_app_to_access_your_camera_desp),
+                            modifier = Modifier.fillMaxWidth(0.85f),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.surface,
+                                textAlign = TextAlign.Center
+                            )
+                        )
+                        Spacer(Modifier.height(30.dp))
+                        CameraPermissionCard(
+                            cameraPermissionGranted = cameraPermissionGranted,
+                            modifier = Modifier.fillMaxWidth(0.9f),
+                            onRequestCameraPermission = {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            })
+                    }
                 }
             }
+            BarcodeNumberSection(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                barcodeNumber = state.barcodeNumber,
+                showBarcodeNumberSection = state.showBarcodeNumberSection,
+                onToggleBarcodeNumberSection = {
+                    viewModel.onAction(ScanMealAction.OnToggleBarcodeNumberSection)
+                },
+                onAnalyzeBarcodeMeal = {
+                    viewModel.onAction(ScanMealAction.OnToggleBarcodeNumberSection)
+                    viewModel.onAction(
+                        ScanMealAction.OnAnalyzeBarcodeMeal(
+                            barcode = state.barcodeNumber.text.toString(),
+                            bitmap = state.mealBitmap,
+                            lifecycleOwner = lifeCycleOwner
+                        )
+                    )
+                })
         }
     }
 }

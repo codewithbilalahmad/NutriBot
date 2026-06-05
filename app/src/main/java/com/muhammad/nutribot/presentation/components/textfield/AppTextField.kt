@@ -52,6 +52,7 @@ fun AppTextField(
     enabled: Boolean = true,
     readOnly: Boolean = false,
     onClick: () -> Unit = {},
+    onKeyboardAction : () -> Unit = {},
     onTrailingClick: () -> Unit = {},
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.MultiLine(2),
     shape : Shape = RoundedCornerShape(16.dp),
@@ -77,6 +78,9 @@ fun AppTextField(
         enabled = enabled,
         textStyle = textStyle,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        onKeyboardAction = {
+            onKeyboardAction()
+        },
         lineLimits = lineLimits,
         readOnly = readOnly,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.surface),

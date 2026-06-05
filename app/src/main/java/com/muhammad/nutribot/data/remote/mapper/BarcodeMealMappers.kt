@@ -14,7 +14,7 @@ fun BarcodeMealDto.toFood(): Food {
         fat = nutriments?.fat?.toInt() ?: 0,
         carbs = nutriments?.carbs?.toInt() ?: 0,
         numberOfServings = 1,
-        eatenAt = System.currentTimeMillis(),
+        eatenAt = 0L,
         confidenceScore = 100,
         ingredients = emptyList(),
         isFavorite = false

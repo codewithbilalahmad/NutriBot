@@ -10,11 +10,13 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.muhammad.nutribot.NutriBotApplication
-import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -267,4 +269,34 @@ fun getCurrentWeekMillis(): Pair<Long, Long> {
 
 fun String.isNetworkUrl(): Boolean {
     return startsWith("http://") || startsWith("https://")
+}
+fun scanBarcodeFromBitmap(
+    bitmap: Bitmap,
+    onSuccess : (String) -> Unit,
+    onFailure : () -> Unit
+){
+    val options = BarcodeScannerOptions.Builder()
+        .setBarcodeFormats(
+            Barcode.FORMAT_EAN_13,
+            Barcode.FORMAT_EAN_8,
+            Barcode.FORMAT_UPC_A,
+            Barcode.FORMAT_UPC_E
+        )
+        .build()
+
+    val scanner = BarcodeScanning.getClient(options)
+    val image = InputImage.fromBitmap(bitmap, 0)
+    scanner.process(image)
+        .addOnSuccessListener { barcodes ->
+            val barcode = barcodes.firstOrNull()?.rawValue
+
+            if (!barcode.isNullOrEmpty()) {
+                onSuccess(barcode)
+            } else {
+                onFailure()
+            }
+        }
+        .addOnFailureListener{
+            onFailure()
+        }
 }

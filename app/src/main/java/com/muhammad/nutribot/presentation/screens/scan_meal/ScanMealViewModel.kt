@@ -13,15 +13,18 @@ import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.ScanOption
 import com.muhammad.nutribot.domain.model.ScannedMeal
 import com.muhammad.nutribot.domain.model.toFood
+import com.muhammad.nutribot.domain.repository.barcode_meal.BarcodeMealRepository
 import com.muhammad.nutribot.domain.repository.camera.CameraController
 import com.muhammad.nutribot.utils.Constants.GEMINI_API_KEY
 import com.muhammad.nutribot.utils.Constants.GEMINI_MODEL_NAME
+import com.muhammad.nutribot.utils.Result
 import com.muhammad.nutribot.utils.SnackbarEvent
 import com.muhammad.nutribot.utils.cleanJson
 import com.muhammad.nutribot.utils.decodeBitmap
 import com.muhammad.nutribot.utils.detectImageContainsMeal
 import com.muhammad.nutribot.utils.resizeBitmap
 import com.muhammad.nutribot.utils.saveBitmapToFile
+import com.muhammad.nutribot.utils.scanBarcodeFromBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +41,7 @@ import kotlinx.serialization.json.Json
 class ScanMealViewModel(
     savedStateHandle: SavedStateHandle,
     val cameraController: CameraController,
+    private val barcodeMealRepository: BarcodeMealRepository,
 ) : ViewModel() {
     private val context = NutriBotApplication.INSTANCE
     private val galleryUri = savedStateHandle.get<String?>("galleryUri")
@@ -54,6 +58,7 @@ class ScanMealViewModel(
     private val _snackbarEvents = Channel<SnackbarEvent>()
     val snackbarEvents = _snackbarEvents.receiveAsFlow()
     private val generativeModel: GenerativeModel
+    private var barcodeInProgress = false
 
     init {
         val config = generationConfig {
@@ -62,32 +67,72 @@ class ScanMealViewModel(
         generativeModel = GenerativeModel(
             modelName = GEMINI_MODEL_NAME, apiKey = GEMINI_API_KEY, generationConfig = config
         )
-        if(galleryUri != null){
-            onAction(ScanMealAction.OnPickMealGalleryImage(uri = galleryUri, lifecycleOwner = context as LifecycleOwner))
+        if (galleryUri != null) {
+            onAction(
+                ScanMealAction.OnPickMealGalleryImage(
+                    uri = galleryUri,
+                    lifecycleOwner = context as LifecycleOwner
+                )
+            )
         }
     }
 
     fun onAction(action: ScanMealAction) {
         when (action) {
-           is ScanMealAction.OnCaptureMealPhoto -> onCaptureMealPhoto(action.lifecycleOwner)
+            is ScanMealAction.OnCaptureMealPhoto -> onCaptureMealPhoto(action.lifecycleOwner)
             ScanMealAction.OnNotifyNoInternetConnection -> onNotifyNoInternetConnection()
-            is ScanMealAction.OnPickMealGalleryImage -> onPickMealGalleryImage(uri = action.uri, lifecycleOwner = action.lifecycleOwner)
+            is ScanMealAction.OnPickMealGalleryImage -> onPickMealGalleryImage(
+                uri = action.uri,
+                lifecycleOwner = action.lifecycleOwner
+            )
+
             is ScanMealAction.OnStartCamera -> onStartCamera(action.lifecycleOwner)
             ScanMealAction.OnToggleFlash -> onToggleFlash()
             ScanMealAction.OnToggleCameraPermissionPermanentlyDeniedDialog -> onToggleCameraPermissionPermanentlyDeniedDialog()
-            is ScanMealAction.OnScanMealOptionChange -> onScanMealOptionChange(action.scanOption)
+            is ScanMealAction.OnScanMealOptionChange -> onScanMealOptionChange(
+                scanOption = action.scanOption,
+                lifecycleOwner = action.lifecycleOwner
+            )
+
+            ScanMealAction.OnToggleBarcodeNumberSection -> onToggleBarcodeNumberSection()
+            is ScanMealAction.OnAnalyzeBarcodeMeal -> analyzeBarcodeMeal(
+                barcode = action.barcode,
+                bitmap = action.bitmap,
+                lifecycleOwner = action.lifecycleOwner
+            )
+
+            is ScanMealAction.OnPickBarcodeGalleryImage -> onPickBarcodeGalleryImage(
+                uri = action.uri,
+                lifecycleOwner = action.lifecycleOwner
+            )
         }
     }
 
-    private fun onScanMealOptionChange(scanOption: ScanOption) {
+    private fun onPickBarcodeGalleryImage(
+        uri: String,
+        lifecycleOwner: LifecycleOwner
+    ) {
+        val bitmap = decodeBitmap(uri) ?: return
+        scanBarcodeFromBitmap(bitmap = bitmap, onSuccess = {barcode ->
+            analyzeBarcodeMeal(barcode = barcode, bitmap = bitmap, lifecycleOwner = lifecycleOwner)
+        }, onFailure = {
+            _snackbarEvents.trySend(
+                SnackbarEvent.ShowSnackbar(
+                    message = context.getString(R.string.no_barcode_detected),
+                    icon = R.drawable.ic_barcode
+                )
+            )
+        })
+    }
+
+    private fun onToggleBarcodeNumberSection() {
+        _state.update { it.copy(showBarcodeNumberSection = !it.showBarcodeNumberSection) }
+    }
+
+    private fun onScanMealOptionChange(scanOption: ScanOption, lifecycleOwner: LifecycleOwner) {
+        if (state.value.scanOption == scanOption) return
         _state.update { it.copy(scanOption = scanOption) }
-    }
-
-    private fun onToggleCameraPermissionPermanentlyDeniedDialog() {
-        _state.update { it.copy(showCameraPermissionPermanentlyDeniedDialog = !it.showCameraPermissionPermanentlyDeniedDialog) }
-    }
-
-    private fun onStartCamera(lifecycleOwner: LifecycleOwner) {
+        cameraController.stopCamera()
         cameraController.startCamera(
             lifecycleOwner = lifecycleOwner,
             onCameraBinding = {
@@ -101,11 +146,47 @@ class ScanMealViewModel(
                 _state.update {
                     it.copy(mealDetected = mealDetected)
                 }
-            }, scanOption = state.value.scanOption, onBarcodeDetected = {}
+            }, onBarcodeDetected = { barcode, bitmap ->
+                analyzeBarcodeMeal(
+                    barcode = barcode,
+                    bitmap = bitmap,
+                    lifecycleOwner = lifecycleOwner
+                )
+            },
+            scanOption = scanOption
         )
     }
 
-    private fun onPickMealGalleryImage(uri: String,lifecycleOwner: LifecycleOwner) {
+    private fun onToggleCameraPermissionPermanentlyDeniedDialog() {
+        _state.update { it.copy(showCameraPermissionPermanentlyDeniedDialog = !it.showCameraPermissionPermanentlyDeniedDialog) }
+    }
+
+    private fun onStartCamera(lifecycleOwner: LifecycleOwner) {
+        cameraController.resetBarcodeAnalyzer()
+        cameraController.startCamera(
+            lifecycleOwner = lifecycleOwner,
+            onCameraBinding = {
+                _state.update { it.copy(isCameraLoading = true) }
+            },
+            onCameraBindSuccess = {
+                _state.update { it.copy(isCameraLoading = false) }
+            },
+            onMealDetected = { mealDetected ->
+
+                _state.update {
+                    it.copy(mealDetected = mealDetected)
+                }
+            }, scanOption = state.value.scanOption, onBarcodeDetected = { barcode, bitmap ->
+                analyzeBarcodeMeal(
+                    barcode = barcode,
+                    bitmap = bitmap,
+                    lifecycleOwner = lifecycleOwner
+                )
+            }
+        )
+    }
+
+    private fun onPickMealGalleryImage(uri: String, lifecycleOwner: LifecycleOwner) {
         val bitmap = decodeBitmap(uri) ?: return
         detectImageContainsMeal(bitmap = bitmap, onResult = { isMealPhoto ->
             if (isMealPhoto) {
@@ -123,7 +204,7 @@ class ScanMealViewModel(
 
     private fun onCaptureMealPhoto(lifecycleOwner: LifecycleOwner) {
         cameraController.capturePhoto { bitmap ->
-            analyzeMeal(bitmap= bitmap, lifecycleOwner = lifecycleOwner)
+            analyzeMeal(bitmap = bitmap, lifecycleOwner = lifecycleOwner)
         }
     }
 
@@ -141,7 +222,7 @@ class ScanMealViewModel(
         cameraController.toggleFlash()
     }
 
-    private fun analyzeMeal(bitmap: Bitmap,lifecycleOwner: LifecycleOwner) {
+    private fun analyzeMeal(bitmap: Bitmap, lifecycleOwner: LifecycleOwner) {
         viewModelScope.launch {
             try {
                 cameraController.stopCamera()
@@ -233,7 +314,7 @@ OUTPUT RULES:
                     image(resizedBitmap)
                     text(prompt)
                 }
-                val response = withContext(Dispatchers.IO){
+                val response = withContext(Dispatchers.IO) {
                     generativeModel.generateContent(inputContent)
                 }
                 val rawText = response.text ?: ""
@@ -253,9 +334,10 @@ OUTPUT RULES:
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                cameraController.startCamera(lifecycleOwner = lifecycleOwner, onCameraBinding = {
-                    _state.update { it.copy(isCameraLoading = true) }
-                },
+                cameraController.startCamera(
+                    lifecycleOwner = lifecycleOwner, onCameraBinding = {
+                        _state.update { it.copy(isCameraLoading = true) }
+                    },
                     onCameraBindSuccess = {
                         _state.update { it.copy(isCameraLoading = false) }
                     },
@@ -264,7 +346,13 @@ OUTPUT RULES:
                         _state.update {
                             it.copy(mealDetected = mealDetected)
                         }
-                    }, scanOption = state.value.scanOption, onBarcodeDetected = {})
+                    }, scanOption = state.value.scanOption, onBarcodeDetected = { barcode, bitmap ->
+                        analyzeBarcodeMeal(
+                            barcode = barcode,
+                            bitmap = bitmap,
+                            lifecycleOwner = lifecycleOwner
+                        )
+                    })
                 _snackbarEvents.trySend(
                     SnackbarEvent.ShowSnackbar(
                         message = context.getString(R.string.error_analyzing_meal),
@@ -272,7 +360,74 @@ OUTPUT RULES:
                     )
                 )
             } finally {
-                _state.update { it.copy(isAnalyzingMeal = false,analyzingMealStepIndex = 0) }
+                _state.update {
+                    it.copy(
+                        isAnalyzingMeal = false,
+                        mealBitmap = null,
+                        analyzingMealStepIndex = 0
+                    )
+                }
+            }
+        }
+    }
+
+    private fun analyzeBarcodeMeal(
+        barcode: String,
+        bitmap: Bitmap?,
+        lifecycleOwner: LifecycleOwner,
+    ) {
+        if (barcodeInProgress) return
+        barcodeInProgress = true
+        viewModelScope.launch {
+            try {
+                cameraController.stopCamera()
+                _state.update { it.copy(mealBitmap = bitmap, isAnalyzingMeal = true) }
+                val foodResponse = withContext(Dispatchers.IO) {
+                    barcodeMealRepository.getBarcodeMeal(barcode)
+                }
+                _state.update { it.copy(isAnalyzingMeal = false) }
+                barcodeInProgress = false
+                when (foodResponse) {
+                    is Result.Error -> {
+                        _snackbarEvents.trySend(
+                            SnackbarEvent.ShowSnackbar(
+                                message = context.getString(R.string.error_analyzing_meal),
+                                icon = R.drawable.ic_info
+                            )
+                        )
+                    }
+
+                    is Result.Success -> {
+                        foodResponse.data?.let { food ->
+                            _events.trySend(ScanMealEvent.OnMealAnalyzedSuccess(food))
+                        }
+                    }
+                }
+            } finally {
+                _state.update { it.copy(isAnalyzingMeal = false, mealBitmap = null) }
+                barcodeInProgress = false
+                cameraController.startCamera(
+                    lifecycleOwner = lifecycleOwner,
+                    onCameraBinding = {
+                        _state.update { it.copy(isCameraLoading = true) }
+                    },
+                    onCameraBindSuccess = {
+                        _state.update { it.copy(isCameraLoading = false) }
+                    },
+                    onMealDetected = { mealDetected ->
+
+                        _state.update {
+                            it.copy(mealDetected = mealDetected)
+                        }
+                    }, onBarcodeDetected = { barcode, bitmap ->
+                        analyzeBarcodeMeal(
+                            barcode = barcode,
+                            bitmap = bitmap,
+                            lifecycleOwner = lifecycleOwner
+                        )
+                    },
+                    scanOption = state.value.scanOption
+                )
             }
         }
     }
