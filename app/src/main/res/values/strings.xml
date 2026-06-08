@@ -146,4 +146,7 @@
     <string name="type_barcode_number">Type barcode number</string>
     <string name="barcode_hint">8901234567890</string>
     <string name="no_barcode_detected">No Barcoded detected</string>
+    <string name="monthly_heatmap">Monthly Heat Map</string>
+    <string name="less">Less</string>
+    <string name="more">More</string>
 </resources>

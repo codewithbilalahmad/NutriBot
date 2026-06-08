@@ -17,9 +17,12 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.muhammad.nutribot.NutriBotApplication
+import com.muhammad.nutribot.domain.model.Food
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.isoDayNumber
@@ -299,4 +302,32 @@ fun scanBarcodeFromBitmap(
         .addOnFailureListener{
             onFailure()
         }
+}
+fun LocalDate.firstDayOfMonth(): LocalDate =
+    LocalDate(year, month, 1)
+
+fun LocalDate.lastDayOfMonth(): LocalDate =
+    firstDayOfMonth().plus(DatePeriod(months = 1))
+        .minus(DatePeriod(days = 1))
+
+fun LocalDate.isLeapYear(): Boolean {
+    val year = this.year
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+}
+
+fun LocalDate.daysInMonth(): Int {
+    return when (month) {
+        Month.JANUARY -> 31
+        Month.FEBRUARY -> if (isLeapYear()) 29 else 28
+        Month.MARCH -> 31
+        Month.APRIL -> 30
+        Month.MAY -> 31
+        Month.JUNE -> 30
+        Month.JULY -> 31
+        Month.AUGUST -> 31
+        Month.SEPTEMBER -> 30
+        Month.OCTOBER -> 31
+        Month.NOVEMBER -> 30
+        Month.DECEMBER -> 31
+    }
 }

@@ -10,6 +10,7 @@ import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
 import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMealsScreen
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailScreen
 import com.muhammad.nutribot.presentation.screens.nurition_setup.NutritionSetupScreen
+import com.muhammad.nutribot.presentation.screens.progress.ProgressScreen
 import com.muhammad.nutribot.presentation.screens.scan_meal.ScanMealScreen
 import com.muhammad.nutribot.presentation.screens.search_meal.SearchMealScreen
 import com.muhammad.nutribot.presentation.screens.setting.SettingScreen
@@ -53,7 +54,7 @@ fun AppNavigation(
                 )
             }
             composable<Destination.ProgressScreen> {
-
+                ProgressScreen(navHostController = navController)
             }
             composable<Destination.StreakScreen> {
                 StreakScreen(navHostController = navController)
