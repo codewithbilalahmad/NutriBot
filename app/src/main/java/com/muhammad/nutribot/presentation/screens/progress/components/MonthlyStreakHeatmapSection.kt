@@ -54,7 +54,7 @@ fun MonthlyStreakHeatmapSection(
     goalCalories: Int,
     cellSize: Dp = 30.dp,
     cellPadding: Dp = 4.dp,
-    dayLabels: List<String> = listOf("M", "T", "W", "T", "F", "S", "S"),
+    dayLabels: List<String> = listOf("M", "T", "W", "T", "F", "S", "S")
 ) {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val firstDayOfMonth = today.firstDayOfMonth()

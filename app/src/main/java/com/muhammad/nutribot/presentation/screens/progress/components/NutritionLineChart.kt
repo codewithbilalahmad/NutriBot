@@ -42,7 +42,7 @@ fun NutritionLineChart(
     labelBorderColor: Color = MaterialTheme.colorScheme.surface,
     labelFontSize: TextUnit = MaterialTheme.typography.bodySmall.fontSize,
     labelColor: Color = MaterialTheme.colorScheme.onBackground,
-    unit: String = stringResource(R.string.grams),
+    unit: String = stringResource(R.string.grams)
 ) {
     val context = LocalContext.current
     val today = stringResource(R.string.today)

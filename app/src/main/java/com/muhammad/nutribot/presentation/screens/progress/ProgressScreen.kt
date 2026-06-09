@@ -34,6 +34,7 @@ import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.diary.DiaryAction
 import com.muhammad.nutribot.presentation.screens.diary.components.AddFoodOptionCard
 import com.muhammad.nutribot.presentation.screens.progress.components.MonthlyStreakHeatmapSection
+import com.muhammad.nutribot.presentation.screens.progress.components.NuritionCaloriesChart
 import com.muhammad.nutribot.presentation.screens.progress.components.NutritionLineChartSection
 import com.muhammad.nutribot.presentation.screens.progress.components.ProgressTopbar
 import com.muhammad.nutribot.presentation.theme.CarbsColor
@@ -84,6 +85,11 @@ fun ProgressScreen(
                             .animateItem(), monthMeals = state.monthMeals,
                         goalCalories = state.goalCalories
                     )
+                }
+                item("NuritionCaloriesChart") {
+                    NuritionCaloriesChart(modifier = Modifier
+                        .fillMaxWidth()
+                        .animateItem(), points = state.nutritionCaloriesPoints,targetCalories = state.goalCalories)
                 }
                 item("protein_chart") {
                     NutritionLineChartSection(
