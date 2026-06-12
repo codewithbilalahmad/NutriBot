@@ -1,6 +1,7 @@
 package com.muhammad.nutribot.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -210,6 +212,13 @@ fun checkPermissionGranted(context: Context, permission: String): Boolean {
         context,
         permission
     ) == PackageManager.PERMISSION_GRANTED
+}
+
+fun checkPermissionPermanentlyDenied(activity : Activity, permission: String) : Boolean{
+    return ActivityCompat.checkSelfPermission(
+        activity,
+        permission
+    ) != PackageManager.PERMISSION_GRANTED && !ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
 }
 
 fun openPermissionSettings(context: Context) {

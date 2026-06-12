@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -69,7 +70,7 @@ fun HeartLikeAnimation(
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_favourite_filled),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.background,
+                tint = Color.White,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = heartScale.value

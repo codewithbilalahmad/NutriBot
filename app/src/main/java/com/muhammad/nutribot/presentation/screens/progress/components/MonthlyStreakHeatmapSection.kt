@@ -1,7 +1,6 @@
 package com.muhammad.nutribot.presentation.screens.progress.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -30,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Food
+import com.muhammad.nutribot.utils.dashedBorder
 import com.muhammad.nutribot.utils.daysInMonth
 import com.muhammad.nutribot.utils.firstDayOfMonth
 import kotlinx.datetime.DatePeriod
@@ -63,10 +64,9 @@ fun MonthlyStreakHeatmapSection(
     val daysInMonth = today.daysInMonth()
     val startOffset = firstDayOfMonth.dayOfWeek.ordinal
     Card(
-        modifier = modifier,
+        modifier = modifier.dashedBorder(brush = SolidColor(MaterialTheme.colorScheme.error), shape = RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        border = BorderStroke(width = 1.5.dp, color = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(
             modifier = Modifier
@@ -157,7 +157,11 @@ fun MonthlyStreakHeatmapSection(
                                         label = "containerColor"
                                     )
                                     val contentColor by animateColorAsState(
-                                        targetValue = if (meals.isEmpty()) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onPrimary,
+                                        targetValue = when {
+                                            meals.isEmpty() -> MaterialTheme.colorScheme.surface
+                                            progress < 0.5f -> MaterialTheme.colorScheme.onSurface
+                                            else -> MaterialTheme.colorScheme.onPrimary
+                                        },
                                         animationSpec = MaterialTheme.motionScheme.fastEffectsSpec(),
                                         label = "contentColor"
                                     )

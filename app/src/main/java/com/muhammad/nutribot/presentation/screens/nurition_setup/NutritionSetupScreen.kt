@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -38,6 +39,7 @@ import com.muhammad.nutribot.R
 import com.muhammad.nutribot.domain.model.Nutrition
 import com.muhammad.nutribot.presentation.components.textfield.AppTextField
 import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPickerHorizontal
+import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.ActivityLevelStepSection
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.GenderStepSection
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.HeightStepSection
@@ -50,6 +52,7 @@ import com.muhammad.nutribot.presentation.screens.nurition_setup.components.Weig
 import com.muhammad.nutribot.presentation.theme.CarbsColor
 import com.muhammad.nutribot.presentation.theme.FatColor
 import com.muhammad.nutribot.presentation.theme.ProteinColor
+import com.muhammad.nutribot.utils.ObserveAsEvents
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -58,6 +61,13 @@ fun NutritionSetupScreen(
     viewModel: NutritionSetupViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    ObserveAsEvents(viewModel.events) {event->
+        when(event){
+            NuritionStepEvent.OnSaveNuritionSuccess -> {
+                navHostController.navigate(Destination.AllowNotificationsScreen)
+            }
+        }
+    }
     BackHandler {
         when {
             state.nutritionCalculation != null -> {
@@ -204,6 +214,7 @@ fun NutritionSetupScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp),
+                                    lineLimits = TextFieldLineLimits.SingleLine,
                                     contentAlignment = Arrangement.Center,
                                     boxContentAlignment = Alignment.Center,
                                     contentPadding = PaddingValues(

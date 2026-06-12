@@ -97,8 +97,8 @@ fun NutritionLineChart(
         val xLabelHeight = fm.descent - fm.ascent
 
 
-        val leftPadding = widestYLabelWidth + 48f
-        val rightPadding = 24f
+        val leftPadding = widestYLabelWidth
+        val rightPadding = 0f
         val topPadding = 36f
         val bottomPadding = xLabelHeight + 40f
 

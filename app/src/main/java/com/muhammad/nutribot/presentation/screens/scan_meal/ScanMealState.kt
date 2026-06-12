@@ -22,6 +22,7 @@ data class ScanMealState(
     val isAnalyzingMeal : Boolean = false,
     val scanOption: ScanOption = ScanOption.MEAL,
     val showBarcodeNumberSection : Boolean = false,
+    val galleryUri : String?=null,
     val barcodeNumber : TextFieldState = TextFieldState()
 ){
     val currentAnalyzingMealStep = analyzingMealSteps[analyzingMealStepIndex]

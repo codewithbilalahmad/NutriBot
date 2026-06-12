@@ -78,8 +78,8 @@ fun NuritionCaloriesChart(
 
         val widestYLabelWidth = yLabels.maxOf { yLabelPaint.measureText("$it") }
 
-        val leftPadding = widestYLabelWidth + 48f
-        val rightPadding = 16f
+        val leftPadding = widestYLabelWidth
+        val rightPadding = 0f
         val topPadding = 16f
         val bottomPadding = 56f
 

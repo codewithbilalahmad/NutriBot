@@ -154,7 +154,6 @@ fun ScanMealScreen(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is ScanMealEvent.OnMealAnalyzedSuccess -> {
-                println("Meal Data : ${event.food}")
                 navHostController.navigate(Destination.MealDetailScreen(event.food))
             }
         }
@@ -180,16 +179,13 @@ fun ScanMealScreen(
     DisposableEffect(lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                cameraPermissionGranted =
-                    checkPermissionGranted(context, Manifest.permission.CAMERA)
-                if (cameraPermissionGranted && !state.isAnalyzingMeal) {
+                cameraPermissionGranted = checkPermissionGranted(context, Manifest.permission.CAMERA)
+                if (cameraPermissionGranted && !state.isAnalyzingMeal && state.galleryUri == null) {
                     viewModel.onAction(ScanMealAction.OnStartCamera(lifeCycleOwner))
                 }
             }
         }
-
         lifeCycleOwner.lifecycle.addObserver(observer)
-
         onDispose {
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }

@@ -10,10 +10,13 @@ import com.muhammad.nutribot.domain.model.UserProfile
 import com.muhammad.nutribot.domain.repository.nutrition_calculation.NutritionCalculationRepository
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NutritionSetupViewModel(
     private val nutritionCalculationRepository: NutritionCalculationRepository,
@@ -21,6 +24,8 @@ class NutritionSetupViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(NutritionSetupState())
     val state = _state.asStateFlow()
+    private val _events = Channel<NuritionStepEvent>()
+    val events = _events.receiveAsFlow()
     fun onAction(action: NutritionSetupAction) {
         when (action) {
             is NutritionSetupAction.OnChangeCurrentStep -> onChangeCurrentStep(action.isIncrement)
@@ -51,7 +56,9 @@ class NutritionSetupViewModel(
             )
             settingRepository.saveUserProfile(userProfile)
             settingRepository.saveNutritionCalculation(nutritionCalculation)
-            settingRepository.saveIsUserLoggedIn(true)
+            withContext(Dispatchers.Main){
+                _events.send(NuritionStepEvent.OnSaveNuritionSuccess)
+            }
         }
     }
 

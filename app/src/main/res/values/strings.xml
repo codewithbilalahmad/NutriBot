@@ -149,4 +149,14 @@
     <string name="monthly_heatmap">Monthly Heat Map</string>
     <string name="less">Less</string>
     <string name="more">More</string>
+    <string name="app_cretor">Muhammad Bilal</string>
+    <string name="idea_and_execution"><![CDATA[Idea & Execution]]></string>
+    <string name="android">Android</string>
+    <string name="design">Design</string>
+    <string name="company">Company</string>
+    <string name="company_name">Muhammad LLC</string>
+    <string name="skip">Skip</string>
+    <string name="allow_notifications">Allow Notifications</string>
+    <string name="allow_notifications_title">Hit your goal fast and easier</string>
+    <string name="allow_notifications_desp">Enable notifications so you never forget to track your calories.</string>
 </resources>

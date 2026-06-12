@@ -30,6 +30,7 @@ import com.muhammad.nutribot.domain.repository.reminder.MealReminderScheduler
 import com.muhammad.nutribot.domain.repository.search_food.SearchFoodRespository
 import com.muhammad.nutribot.domain.repository.settings.SettingRepository
 import com.muhammad.nutribot.main.MainViewModel
+import com.muhammad.nutribot.presentation.screens.allow_notifications.AllowNotificationsViewModel
 import com.muhammad.nutribot.presentation.screens.diary.DiaryViewModel
 import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMealsViewModel
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailViewModel
@@ -77,6 +78,7 @@ val appModule = module {
     singleOf(::BarcodeMealRepositoryImp).bind<BarcodeMealRepository>()
     viewModelOf(::MainViewModel)
     viewModelOf(::NutritionSetupViewModel)
+    viewModelOf(::AllowNotificationsViewModel)
     viewModelOf(::DiaryViewModel)
     viewModelOf(::SettingViewModel)
     viewModelOf(::ScanMealViewModel)

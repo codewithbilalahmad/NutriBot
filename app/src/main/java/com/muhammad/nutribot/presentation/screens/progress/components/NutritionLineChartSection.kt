@@ -46,6 +46,6 @@ fun NutritionLineChartSection(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
         }
-        NutritionLineChart(modifier = Modifier.fillMaxWidth(), points = points, lineColor = color)
+        NutritionLineChart(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), points = points, lineColor = color)
     }
 }

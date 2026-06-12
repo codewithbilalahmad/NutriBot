@@ -62,7 +62,7 @@ fun ScanMealBottomBar(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             IconButton(
                 onClick = onPickMealGalleryImage,
@@ -98,7 +98,7 @@ fun ScanMealBottomBar(
                                 .weight(1f)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.background.copy(0.4f))
-                                .padding(vertical = 16.dp).rippleClickable(onClick = onToggleBarcodeNumberSection), contentAlignment = Alignment.Center
+                                .padding(vertical = 20.dp).rippleClickable(onClick = onToggleBarcodeNumberSection), contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = stringResource(R.string.enter_barcode_number),

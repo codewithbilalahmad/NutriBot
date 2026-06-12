@@ -58,6 +58,7 @@ import com.muhammad.nutribot.presentation.components.alert_dialog.AppAlertDialog
 import com.muhammad.nutribot.presentation.components.button.PrimaryButton
 import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPicker
 import com.muhammad.nutribot.presentation.components.wheel_picker.WheelPickerHorizontal
+import com.muhammad.nutribot.presentation.navigation.Destination
 import com.muhammad.nutribot.presentation.screens.nurition_setup.components.ActivityLevelCard
 import com.muhammad.nutribot.presentation.screens.setting.components.GenderCard
 import com.muhammad.nutribot.presentation.screens.setting.components.SettingHeader
@@ -323,7 +324,9 @@ fun SettingScreen(
                         icon = R.drawable.ic_info,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .animateItem(), onClick = {}
+                            .animateItem(), onClick = {
+                                navHostController.navigate(Destination.CreditsScreen)
+                        }
                     )
                 }
             }

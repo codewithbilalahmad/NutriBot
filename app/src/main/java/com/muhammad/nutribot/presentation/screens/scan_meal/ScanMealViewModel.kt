@@ -61,6 +61,7 @@ class ScanMealViewModel(
     private var barcodeInProgress = false
 
     init {
+        _state.update { it.copy(galleryUri = galleryUri) }
         val config = generationConfig {
             temperature = 0.3f
         }
@@ -68,12 +69,7 @@ class ScanMealViewModel(
             modelName = GEMINI_MODEL_NAME, apiKey = GEMINI_API_KEY, generationConfig = config
         )
         if (galleryUri != null) {
-            onAction(
-                ScanMealAction.OnPickMealGalleryImage(
-                    uri = galleryUri,
-                    lifecycleOwner = context as LifecycleOwner
-                )
-            )
+            onPickMealGalleryImage(galleryUri)
         }
     }
 
@@ -201,6 +197,21 @@ class ScanMealViewModel(
             }
         })
     }
+    private fun onPickMealGalleryImage(uri: String) {
+        val bitmap = decodeBitmap(uri) ?: return
+        detectImageContainsMeal(bitmap = bitmap, onResult = { isMealPhoto ->
+            if (isMealPhoto) {
+                analyzeMeal(bitmap = bitmap)
+            } else {
+                _snackbarEvents.trySend(
+                    SnackbarEvent.ShowSnackbar(
+                        message = context.getString(R.string.no_meal_detected),
+                        icon = R.drawable.ic_launcher_foreground
+                    )
+                )
+            }
+        })
+    }
 
     private fun onCaptureMealPhoto(lifecycleOwner: LifecycleOwner) {
         cameraController.capturePhoto { bitmap ->
@@ -222,10 +233,12 @@ class ScanMealViewModel(
         cameraController.toggleFlash()
     }
 
-    private fun analyzeMeal(bitmap: Bitmap, lifecycleOwner: LifecycleOwner) {
+    private fun analyzeMeal(bitmap: Bitmap, lifecycleOwner: LifecycleOwner?=null) {
         viewModelScope.launch {
             try {
-                cameraController.stopCamera()
+                if(lifecycleOwner != null){
+                    cameraController.stopCamera()
+                }
                 _state.update {
                     it.copy(
                         mealBitmap = bitmap,
@@ -334,25 +347,30 @@ OUTPUT RULES:
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                cameraController.startCamera(
-                    lifecycleOwner = lifecycleOwner, onCameraBinding = {
-                        _state.update { it.copy(isCameraLoading = true) }
-                    },
-                    onCameraBindSuccess = {
-                        _state.update { it.copy(isCameraLoading = false) }
-                    },
-                    onMealDetected = { mealDetected ->
+                if(lifecycleOwner != null) {
+                    cameraController.startCamera(
+                        lifecycleOwner = lifecycleOwner,
+                        onCameraBinding = {
+                            _state.update { it.copy(isCameraLoading = true) }
+                        },
+                        onCameraBindSuccess = {
+                            _state.update { it.copy(isCameraLoading = false) }
+                        },
+                        onMealDetected = { mealDetected ->
 
-                        _state.update {
-                            it.copy(mealDetected = mealDetected)
-                        }
-                    }, scanOption = state.value.scanOption, onBarcodeDetected = { barcode, bitmap ->
-                        analyzeBarcodeMeal(
-                            barcode = barcode,
-                            bitmap = bitmap,
-                            lifecycleOwner = lifecycleOwner
-                        )
-                    })
+                            _state.update {
+                                it.copy(mealDetected = mealDetected)
+                            }
+                        },
+                        scanOption = state.value.scanOption,
+                        onBarcodeDetected = { barcode, bitmap ->
+                            analyzeBarcodeMeal(
+                                barcode = barcode,
+                                bitmap = bitmap,
+                                lifecycleOwner = lifecycleOwner
+                            )
+                        })
+                }
                 _snackbarEvents.trySend(
                     SnackbarEvent.ShowSnackbar(
                         message = context.getString(R.string.error_analyzing_meal),
@@ -364,7 +382,8 @@ OUTPUT RULES:
                     it.copy(
                         isAnalyzingMeal = false,
                         mealBitmap = null,
-                        analyzingMealStepIndex = 0
+                        analyzingMealStepIndex = 0,
+                        galleryUri = null
                     )
                 }
             }

@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.muhammad.nutribot.domain.model.Food
+import com.muhammad.nutribot.presentation.screens.allow_notifications.AllowNotificationsScreen
+import com.muhammad.nutribot.presentation.screens.credits.CreditScreen
 import com.muhammad.nutribot.presentation.screens.diary.DiaryScreen
 import com.muhammad.nutribot.presentation.screens.favourite_meals.FavouriteMealsScreen
 import com.muhammad.nutribot.presentation.screens.meal_details.MealDetailScreen
@@ -23,7 +25,8 @@ import kotlin.reflect.typeOf
 fun AppNavigation(
     navController: NavHostController, isUserLoggedIn: Boolean, isInternetConnected: Boolean,
 ) {
-    val startDestination = if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
+    val startDestination =
+        if (isUserLoggedIn) Destination.DiaryScreen else Destination.WelcomeScreen
     SharedTransitionLayout {
         NavHost(navController = navController, startDestination = startDestination) {
             composable<Destination.WelcomeScreen> {
@@ -71,11 +74,21 @@ fun AppNavigation(
                     sharedTransitionScope = this@SharedTransitionLayout
                 )
             }
-            composable<Destination.FavouriteMealsScreen>{
+            composable<Destination.FavouriteMealsScreen> {
                 FavouriteMealsScreen(navHostController = navController)
             }
-            composable<Destination.SearchMealScreen>{
-                SearchMealScreen(navHostController = navController,sharedTransitionScope = this@SharedTransitionLayout,animatedVisibilityScope = this)
+            composable<Destination.SearchMealScreen> {
+                SearchMealScreen(
+                    navHostController = navController,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
+            }
+            composable<Destination.CreditsScreen> {
+                CreditScreen(navController = navController)
+            }
+            composable<Destination.AllowNotificationsScreen> {
+                AllowNotificationsScreen(navHostController = navController)
             }
         }
     }

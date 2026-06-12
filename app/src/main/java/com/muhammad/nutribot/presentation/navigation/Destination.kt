@@ -28,4 +28,8 @@ sealed interface Destination {
     data object FavouriteMealsScreen : Destination
     @Serializable
     data object SearchMealScreen : Destination
+    @Serializable
+    data object AllowNotificationsScreen : Destination
+    @Serializable
+    data object CreditsScreen : Destination
 }

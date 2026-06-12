@@ -120,7 +120,6 @@ fun StreakProgressScreen(
                 Text(
                     text = streakDescription,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.surface,
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp, lineHeight = 18.sp
                     )

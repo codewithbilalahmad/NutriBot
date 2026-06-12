@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.datastore)
     implementation(libs.room.runtime)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.androidx.ui.graphics)
     "baselineProfile"(project(":baselineprofile"))
     ksp(libs.room.compiler)
     implementation(libs.splashscreen)

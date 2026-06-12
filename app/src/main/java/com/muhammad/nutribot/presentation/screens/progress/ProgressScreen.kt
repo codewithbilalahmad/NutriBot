@@ -89,6 +89,7 @@ fun ProgressScreen(
                 item("NuritionCaloriesChart") {
                     NuritionCaloriesChart(modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                         .animateItem(), points = state.nutritionCaloriesPoints,targetCalories = state.goalCalories)
                 }
                 item("protein_chart") {
